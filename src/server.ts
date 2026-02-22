@@ -11,10 +11,12 @@ const startServer = async (): Promise<void> => {
   try {
     await connectDB();
 
-    const server = app.listen(PORT, () => {
+    // تحديد عنوان الاستماع حسب البيئة
+    const HOST = process.env.NODE_ENV === 'production' ? '0.0.0.0' : '10.114.0.3';
+    const server = app.listen(PORT, HOST, () => {
       logger.info(`🚀 Server running on port ${PORT}`);
-      logger.info(`📚 API Docs: http://localhost:${PORT}/api/docs`);
-      logger.info(`🏥 Health:   http://localhost:${PORT}/api/health`);
+      logger.info(`📚 API Docs: http://${HOST}:${PORT}/api/docs`);
+      logger.info(`🏥 Health:   http://${HOST}:${PORT}/api/health`);
       logger.info(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
     });
 
