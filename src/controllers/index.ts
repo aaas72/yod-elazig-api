@@ -1,0 +1,16 @@
+export * as authController from './authController';
+export * as studentController from './studentController';
+export * as newsController from './newsController';
+export * as eventController from './eventController';
+export * as dashboardController from './dashboardController';
+export * as programController from './programController';
+export * as achievementController from './achievementController';
+export * as faqController from './faqController';
+export * as resourceController from './resourceController';
+export * as settingController from './settingController';
+export * as contactController from './contactController';
+export * as volunteerController from './volunteerController';
+export * as galleryController from './galleryController';
+export * as tickerController from './tickerController';
+export * as translationController from './translationController';
+export * as mediaController from './mediaController';

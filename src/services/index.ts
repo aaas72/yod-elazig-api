@@ -1,0 +1,16 @@
+export { default as authService } from './authService';
+export { default as studentService } from './studentService';
+export { default as newsService } from './newsService';
+export { default as eventService } from './eventService';
+export { default as dashboardService } from './dashboardService';
+export { default as programService } from './programService';
+export { default as achievementService } from './achievementService';
+export { default as faqService } from './faqService';
+export { default as resourceService } from './resourceService';
+export { default as settingService } from './settingService';
+export { default as contactService } from './contactService';
+export { default as volunteerService } from './volunteerService';
+export { default as galleryService } from './galleryService';
+export { default as tickerService } from './tickerService';
+export { default as translationService } from './translationService';
+export { default as mediaService } from './mediaService';
