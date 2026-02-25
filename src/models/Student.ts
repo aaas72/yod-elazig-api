@@ -2,13 +2,20 @@ import mongoose, { Document, Model, Schema } from 'mongoose';
 
 /* ----------------------------- Interface ----------------------------- */
 export interface IStudent extends Document {
-  user: mongoose.Types.ObjectId;
   studentId: string;
+  fullName: string;
+  fullNameEn: string;
+  gender: 'male' | 'female' | 'other';
+  dateOfBirth: Date;
+  phoneNumber: string;
+  email: string;
+  tcNumber: string;
+  profileImage?: string;
+  studentDocument?: string;
+  files?: string[];
   university?: string;
   department?: string;
   yearOfStudy?: number;
-  phone?: string;
-  nationality?: string;
   address?: string;
   enrollmentDate: Date;
   isActive: boolean;
@@ -17,20 +24,62 @@ export interface IStudent extends Document {
   updatedAt: Date;
 }
 
-interface IStudentModel extends Model<IStudent> {}
+interface IStudentModel extends Model<IStudent> { }
 
 /* ----------------------------- Schema ----------------------------- */
 const studentSchema = new Schema<IStudent, IStudentModel>(
   {
-    user: {
-      type: Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
-    },
     studentId: {
       type: String,
       unique: true,
       trim: true,
+    },
+    fullName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    fullNameEn: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    gender: {
+      type: String,
+      enum: ['male', 'female', 'other'],
+      required: true,
+    },
+    dateOfBirth: {
+      type: Date,
+      required: true,
+    },
+    phoneNumber: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      trim: true,
+      lowercase: true,
+    },
+    tcNumber: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    profileImage: {
+      type: String,
+      trim: true,
+    },
+    studentDocument: {
+      type: String,
+      trim: true,
+    },
+    files: {
+      type: [String],
+      default: [],
     },
     university: {
       type: String,
@@ -44,14 +93,6 @@ const studentSchema = new Schema<IStudent, IStudentModel>(
       type: Number,
       min: 1,
       max: 8,
-    },
-    phone: {
-      type: String,
-      trim: true,
-    },
-    nationality: {
-      type: String,
-      trim: true,
     },
     address: {
       type: String,
@@ -78,7 +119,6 @@ const studentSchema = new Schema<IStudent, IStudentModel>(
 );
 
 /* ----------------------------- Indexes ----------------------------- */
-studentSchema.index({ user: 1 });
 studentSchema.index({ isActive: 1 });
 
 /* ----------------------------- Pre-save ----------------------------- */

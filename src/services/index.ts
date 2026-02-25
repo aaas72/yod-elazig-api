@@ -1,5 +1,5 @@
 export { default as authService } from './authService';
-export { default as studentService } from './studentService';
+export { studentService } from './studentService';
 export { default as newsService } from './newsService';
 export { default as eventService } from './eventService';
 export { default as dashboardService } from './dashboardService';

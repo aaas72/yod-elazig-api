@@ -3,6 +3,39 @@ import { studentController } from '../controllers';
 import { verifyToken, authorizeRoles, validate } from '../middlewares';
 import { createStudentRules, updateStudentRules } from '../validators';
 import { ROLES } from '../constants';
+import multer from 'multer';
+import fs from 'fs';
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: function (req, file, cb) {
+      const dir = 'uploads/temp';
+      try {
+        if (!fs.existsSync(dir)) {
+          fs.mkdirSync(dir, { recursive: true });
+        }
+        cb(null, dir);
+      } catch (err) {
+        console.error('Error creating directory:', err);
+        cb(err as Error, dir);
+      }
+    },
+    filename: function (req, file, cb) {
+      const ext = file.originalname.split('.').pop();
+      cb(null, `${Date.now()}-${Math.random().toString(36).substring(2)}.${ext}`);
+    },
+  }),
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  fileFilter: (_req, file, cb) => {
+    const allowed = [
+      'image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf'
+    ];
+    if (allowed.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('نوع الملف غير مدعوم'));
+    }
+  },
+});
 
 const router = Router();
 
@@ -13,19 +46,21 @@ const router = Router();
  *   description: Student management
  */
 
-// All routes require authentication
-router.use(verifyToken);
 
-/**
- * @swagger
- * /api/v1/students/me:
- *   get:
- *     summary: Get my student profile
- *     tags: [Students]
- *     security:
- *       - bearerAuth: []
- */
-router.get('/me', studentController.getMyProfile);
+// Public route for student membership registration (no token required)
+router.post(
+  '/join',
+  upload.fields([
+    { name: 'profileImage', maxCount: 1 },
+    { name: 'studentDocument', maxCount: 1 }
+  ]),
+  createStudentRules,
+  validate,
+  studentController.createStudent
+);
+
+// All routes below require authentication
+router.use(verifyToken);
 
 /**
  * @swagger
@@ -69,9 +104,13 @@ router.get(
 router.post(
   '/',
   authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN),
+  upload.fields([
+    { name: 'profileImage', maxCount: 1 },
+    { name: 'studentDocument', maxCount: 1 }
+  ]),
   createStudentRules,
   validate,
-  studentController.createStudent,
+  studentController.createStudent
 );
 
 /**

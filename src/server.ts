@@ -11,8 +11,10 @@ const startServer = async (): Promise<void> => {
   try {
     await connectDB();
 
-    // تحديد عنوان الاستماع حسب البيئة
-    const HOST = process.env.NODE_ENV === 'production' ? '0.0.0.0' : '10.114.0.3';
+    let HOST = process.env.HOST;
+    if (!HOST) {
+      HOST = process.env.NODE_ENV === 'production' ? '0.0.0.0' : '127.0.0.1';
+    }
     const server = app.listen(PORT, HOST, () => {
       logger.info(`🚀 Server running on port ${PORT}`);
       logger.info(`📚 API Docs: http://${HOST}:${PORT}/api/docs`);

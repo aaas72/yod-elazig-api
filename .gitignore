@@ -2,4 +2,8 @@ node_modules/
 dist/
 logs/
 .env
+.env.development
+.env.production
+uploads/*
+!uploads/.gitkeep
 *.log

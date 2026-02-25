@@ -1,8 +1,6 @@
 import { Router } from 'express';
 import { authController } from '../controllers';
-import { verifyToken } from '../middlewares';
-import { validate } from '../middlewares';
-import { authLimiter } from '../middlewares';
+import { verifyToken, validate, authLimiter } from '../middlewares';
 import {
   registerRules,
   loginRules,

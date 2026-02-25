@@ -2,18 +2,34 @@ import { body, ValidationChain } from 'express-validator';
 
 /** Create a student */
 export const createStudentRules: ValidationChain[] = [
-  body('name')
+  body('fullName')
     .trim()
-    .notEmpty().withMessage('Name is required')
-    .isLength({ min: 2, max: 100 }).withMessage('Name must be 2-100 characters'),
+    .notEmpty().withMessage('Full name (Arabic) is required')
+    .isLength({ min: 2, max: 100 }).withMessage('Full name must be 2-100 characters'),
+  body('fullNameEn')
+    .trim()
+    .notEmpty().withMessage('Full name (English) is required')
+    .isLength({ min: 2, max: 100 }).withMessage('Full name (English) must be 2-100 characters'),
+  body('gender')
+    .notEmpty().withMessage('Gender is required')
+    .isIn(['male', 'female', 'other']).withMessage('Gender must be male, female, or other'),
+  body('dateOfBirth')
+    .notEmpty().withMessage('Date of birth is required')
+    .isISO8601().withMessage('Date of birth must be a valid date'),
+  body('phoneNumber')
+    .trim()
+    .notEmpty().withMessage('Phone number is required'),
   body('email')
     .trim()
     .notEmpty().withMessage('Email is required')
     .isEmail().withMessage('Please provide a valid email')
     .normalizeEmail(),
-  body('password')
-    .notEmpty().withMessage('Password is required')
-    .isLength({ min: 8 }).withMessage('Password must be at least 8 characters'),
+  body('tcNumber')
+    .trim()
+    .notEmpty().withMessage('TC number is required'),
+  body('profileImage')
+    .optional()
+    .trim(),
   body('university')
     .optional()
     .trim()
@@ -25,12 +41,6 @@ export const createStudentRules: ValidationChain[] = [
   body('yearOfStudy')
     .optional()
     .isInt({ min: 1, max: 8 }).withMessage('Year of study must be between 1 and 8'),
-  body('phone')
-    .optional()
-    .trim(),
-  body('nationality')
-    .optional()
-    .trim(),
   body('address')
     .optional()
     .trim(),

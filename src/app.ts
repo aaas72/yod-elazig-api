@@ -10,15 +10,16 @@ import swaggerUi from 'swagger-ui-express';
 
 import corsOptions from './config/cors';
 import swaggerSpec from './config/swagger';
-import { apiLimiter } from './middlewares';
-import { errorHandler, notFound } from './middlewares';
+import { apiLimiter, errorHandler, notFound } from './middlewares';
 import routes from './routes';
 import { logger } from './utils';
 
 const app: Application = express();
 
 // ── Security middleware ──────────────────────────────
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 app.use(cors(corsOptions));
 app.use(mongoSanitize());
 app.use(hpp());
@@ -29,7 +30,9 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // ── Static files (uploads) ───────────────────────────
-app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+const uploadDir = process.env.UPLOAD_DIR || 'uploads';
+app.use(`/${uploadDir}`, express.static(path.join(process.cwd(), uploadDir)));
+app.use(express.static('public'));
 
 // ── Accept-Language middleware (i18n) ────────────────
 app.use((req: Request, _res: Response, next: NextFunction) => {

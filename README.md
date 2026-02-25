@@ -1,3 +1,21 @@
+# بيئات العمل (Work Environments)
+
+يوجد بيئتان للعمل:
+
+ - **بيئة التطوير (Development):**
+	 - ملف البيئة: `.env.development`
+	 - لتشغيل بيئة التطوير:
+		 1. انسخ ملف البيئة: `cp .env.development .env`
+		 2. شغل السيرفر: `npm run dev`
+
+ - **بيئة النشر (Production):**
+	 - ملف البيئة: `.env.production`
+	 - لتشغيل بيئة النشر:
+		 1. انسخ ملف البيئة: `cp .env.production .env`
+		 2. بناء المشروع: `npm run build`
+		 3. شغل السيرفر: `npm start`
+
+راجع ملف [ENVIRONMENTS.md](ENVIRONMENTS.md) لمزيد من التفاصيل.
 # YOD Elazig – Backend API
 
 RESTful API for the **YOD Elazig** Youth Organization platform.  
