@@ -6,14 +6,14 @@ import { CorsOptions } from 'cors';
  */
 const corsOptions: CorsOptions = {
   origin: (origin, callback) => {
+    const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
+      .split(',')
+      .map((o) => o.trim());
+
     // In development, allow all origins
     if (process.env.NODE_ENV === 'development') {
       return callback(null, true);
     }
-
-    const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
-      .split(',')
-      .map((o) => o.trim());
 
     // Allow requests with no origin (mobile apps, curl, Postman)
     if (!origin || allowedOrigins.includes(origin)) {
