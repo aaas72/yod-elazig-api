@@ -1,9 +1,9 @@
 import { body, ValidationChain } from 'express-validator';
 
 export const createAlbumRules: ValidationChain[] = [
-  body('title.ar').trim().notEmpty().withMessage('Arabic title is required'),
-  body('title.en').trim().notEmpty().withMessage('English title is required'),
-  body('title.tr').trim().notEmpty().withMessage('Turkish title is required'),
+  body('title.ar').optional().trim(),
+  body('title.en').optional().trim(),
+  body('title.tr').optional().trim(),
   body('description.ar').optional().trim(),
   body('description.en').optional().trim(),
   body('description.tr').optional().trim(),

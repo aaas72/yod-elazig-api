@@ -2,8 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import sharp from 'sharp';
 import { FilterQuery } from 'mongoose';
-import { Media } from '../models';
-import { IMedia } from '../models/Media';
+import Media, { IMedia } from '../models/Media';
 import { ApiError } from '../utils';
 import { HTTP_STATUS } from '../constants';
 
@@ -48,20 +47,37 @@ class MediaService {
 
     // Process image
     if (file.mimetype.startsWith('image/')) {
-      await sharp(file.buffer)
-        .resize(1200, 1200, { fit: 'inside', withoutEnlargement: true })
-        .jpeg({ quality: 85 })
-        .toFile(filePath);
+      if (file.mimetype === 'image/png') {
+        await sharp(file.buffer)
+          .resize(1200, 1200, { fit: 'inside', withoutEnlargement: true })
+          .png({ quality: 85 })
+          .toFile(filePath);
 
-      // Create thumbnail
-      const thumbFilename = `thumb_${filename}`;
-      const thumbPath = path.join(THUMB_DIR, thumbFilename);
-      await sharp(file.buffer)
-        .resize(300, 300, { fit: 'cover' })
-        .jpeg({ quality: 70 })
-        .toFile(thumbPath);
+        // Create thumbnail
+        const thumbFilename = `thumb_${filename}`;
+        const thumbPath = path.join(THUMB_DIR, thumbFilename);
+        await sharp(file.buffer)
+          .resize(300, 300, { fit: 'cover' })
+          .png({ quality: 70 })
+          .toFile(thumbPath);
 
-      thumbnailUrl = `/uploads/thumbnails/${thumbFilename}`;
+        thumbnailUrl = `/uploads/thumbnails/${thumbFilename}`;
+      } else {
+        await sharp(file.buffer)
+          .resize(1200, 1200, { fit: 'inside', withoutEnlargement: true })
+          .jpeg({ quality: 85 })
+          .toFile(filePath);
+
+        // Create thumbnail
+        const thumbFilename = `thumb_${filename}`;
+        const thumbPath = path.join(THUMB_DIR, thumbFilename);
+        await sharp(file.buffer)
+          .resize(300, 300, { fit: 'cover' })
+          .jpeg({ quality: 70 })
+          .toFile(thumbPath);
+
+        thumbnailUrl = `/uploads/thumbnails/${thumbFilename}`;
+      }
     } else {
       // Non-image file: write directly
       fs.writeFileSync(filePath, file.buffer);

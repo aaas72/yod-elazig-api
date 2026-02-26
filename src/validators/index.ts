@@ -25,8 +25,6 @@ export {
 export { createProgramRules, updateProgramRules } from './programValidator';
 export { createAchievementRules, updateAchievementRules } from './achievementValidator';
 export { createFAQRules, updateFAQRules, reorderFAQRules } from './faqValidator';
-export { createResourceRules, updateResourceRules } from './resourceValidator';
-export { submitContactRules, replyContactRules } from './contactValidator';
 export { submitVolunteerRules, reviewVolunteerRules } from './volunteerValidator';
 export { createAlbumRules, updateAlbumRules, addPhotosRules } from './galleryValidator';
 export { createTickerRules, updateTickerRules } from './tickerValidator';

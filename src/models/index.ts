@@ -22,15 +22,8 @@ export type { IAchievement } from './Achievement';
 export { default as FAQ } from './FAQ';
 export type { IFAQ } from './FAQ';
 
-export { default as Resource } from './Resource';
-export type { IResource } from './Resource';
-
-
 export { default as Setting } from './Setting';
 export type { ISetting } from './Setting';
-
-export { default as Contact } from './Contact';
-export type { IContact } from './Contact';
 
 export { default as Volunteer } from './Volunteer';
 export type { IVolunteer } from './Volunteer';
@@ -44,5 +37,8 @@ export type { ITicker } from './Ticker';
 export { default as Translation } from './Translation';
 export type { ITranslation } from './Translation';
 
-export { default as Media } from './Media';
-export type { IMedia } from './Media';
+export { default as Form } from './Form';
+export type { IForm } from './Form';
+
+export { default as FormSubmission } from './FormSubmission';
+export type { IFormSubmission } from './FormSubmission';

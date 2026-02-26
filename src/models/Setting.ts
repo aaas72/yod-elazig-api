@@ -3,6 +3,16 @@ import mongoose, { Document, Model, Schema } from 'mongoose';
 /* ----------------------------- Interface ----------------------------- */
 export interface ISetting extends Document {
   key: string;
+  siteName?: {
+    ar?: string;
+    en?: string;
+    tr?: string;
+  };
+  siteDescription?: {
+    ar?: string;
+    en?: string;
+    tr?: string;
+  };
   socialLinks: {
     facebook?: string;
     instagram?: string;
@@ -22,6 +32,7 @@ export interface ISetting extends Document {
       tr?: string;
     };
   };
+  googleMapsUrl?: string;
   footer: {
     text?: {
       ar?: string;
@@ -36,6 +47,7 @@ export interface ISetting extends Document {
   };
   logo?: string;
   favicon?: string;
+  volunteerFormLink?: string;
   lastUpdatedBy: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
@@ -50,6 +62,16 @@ const settingSchema = new Schema<ISetting, ISettingModel>(
       type: String,
       default: 'general',
       unique: true,
+    },
+    siteName: {
+      ar: { type: String, trim: true },
+      en: { type: String, trim: true },
+      tr: { type: String, trim: true },
+    },
+    siteDescription: {
+      ar: { type: String, trim: true },
+      en: { type: String, trim: true },
+      tr: { type: String, trim: true },
     },
     socialLinks: {
       facebook: { type: String, trim: true },
@@ -70,6 +92,7 @@ const settingSchema = new Schema<ISetting, ISettingModel>(
         tr: { type: String, trim: true },
       },
     },
+    googleMapsUrl: { type: String, trim: true },
     footer: {
       text: {
         ar: { type: String },
@@ -84,6 +107,7 @@ const settingSchema = new Schema<ISetting, ISettingModel>(
     },
     logo: { type: String },
     favicon: { type: String },
+    volunteerFormLink: { type: String, trim: true },
     lastUpdatedBy: {
       type: Schema.Types.ObjectId,
       ref: 'User',

@@ -29,10 +29,23 @@ class GalleryService {
     if (category) filter.category = category;
     if (isPublished !== undefined) filter.isPublished = isPublished;
 
-    const skip = (page - 1) * limit;
+    // Fix: Handle limit properly if it comes as string "undefined" or NaN
+    const limitNum = limit ? Number(limit) : 10;
+    const pageNum = page ? Number(page) : 1;
+    const skip = (pageNum - 1) * limitNum;
+
     const total = await Album.countDocuments(filter);
-    const data = await Album.find(filter).sort(sort).skip(skip).limit(limit);
-    return { data, pagination: { total, page, limit, pages: Math.ceil(total / limit) } };
+    const data = await Album.find(filter).sort(sort).skip(skip).limit(limitNum);
+    
+    return { 
+      data, 
+      pagination: { 
+        total, 
+        page: pageNum, 
+        limit: limitNum, 
+        pages: Math.ceil(total / limitNum) 
+      } 
+    };
   }
 
   async getPublishedAlbums(category?: string): Promise<IAlbum[]> {

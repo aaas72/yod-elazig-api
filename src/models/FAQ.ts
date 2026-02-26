@@ -12,7 +12,24 @@ export interface IFAQ extends Document {
     en: string;
     tr: string;
   };
-  category?: string;
+  // Steps are now an array of objects, each containing multilingual text and an optional file
+  steps?: {
+    text: {
+      ar: string;
+      en: string;
+      tr: string;
+    };
+    fileUrl?: string;
+  }[];
+  documents?: {
+    name: {
+      ar: string;
+      en: string;
+      tr: string;
+    };
+    url: string;
+  }[];
+  category: string;
   order: number;
   isPublished: boolean;
   createdAt: Date;
@@ -26,15 +43,35 @@ const faqSchema = new Schema<IFAQ, IFAQModel>(
   {
     question: {
       ar: { type: String, required: [true, 'Arabic question is required'], trim: true },
-      en: { type: String, required: [true, 'English question is required'], trim: true },
-      tr: { type: String, required: [true, 'Turkish question is required'], trim: true },
+      en: { type: String, trim: true },
+      tr: { type: String, trim: true },
     },
     answer: {
       ar: { type: String, required: [true, 'Arabic answer is required'] },
-      en: { type: String, required: [true, 'English answer is required'] },
-      tr: { type: String, required: [true, 'Turkish answer is required'] },
+      en: { type: String },
+      tr: { type: String },
     },
-    category: { type: String, trim: true },
+    steps: [
+      {
+        text: {
+          ar: { type: String },
+          en: { type: String },
+          tr: { type: String },
+        },
+        fileUrl: { type: String },
+      }
+    ],
+    documents: [
+      {
+        name: {
+          ar: { type: String },
+          en: { type: String },
+          tr: { type: String },
+        },
+        url: { type: String },
+      },
+    ],
+    category: { type: String, trim: true, required: true },
     order: { type: Number, default: 0 },
     isPublished: { type: Boolean, default: true },
   },

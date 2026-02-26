@@ -28,8 +28,7 @@ export const createEventRules: ValidationChain[] = [
     .isInt({ min: 1 }).withMessage('Capacity must be at least 1'),
   body('coverImage')
     .optional()
-    .trim()
-    .isURL().withMessage('Cover image must be a valid URL'),
+    .trim(),
   body('isPublished')
     .optional()
     .isBoolean().withMessage('isPublished must be a boolean'),
@@ -69,8 +68,7 @@ export const updateEventRules: ValidationChain[] = [
     .isInt({ min: 1 }).withMessage('Capacity must be at least 1'),
   body('coverImage')
     .optional()
-    .trim()
-    .isURL().withMessage('Cover image must be a valid URL'),
+    .trim(),
   body('isPublished')
     .optional()
     .isBoolean().withMessage('isPublished must be a boolean'),

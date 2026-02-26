@@ -1,4 +1,4 @@
-import { User, Student, News, Event, Program, Contact, Volunteer, Album, Achievement, FAQ } from '../models';
+import { User, Student, News, Event, Program, Volunteer, Album, Achievement, FAQ } from '../models';
 import { ROLES } from '../constants';
 
 interface DashboardStats {
@@ -35,12 +35,6 @@ interface DashboardStats {
     ongoing: number;
     completed: number;
   };
-  contacts: {
-    total: number;
-    newCount: number;
-    read: number;
-    replied: number;
-  };
   volunteers: {
     total: number;
     pending: number;
@@ -62,20 +56,19 @@ class DashboardService {
    * Get full dashboard statistics
    */
   async getStats(): Promise<DashboardStats> {
-    const [users, students, news, events, programs, contacts, volunteers, gallery, content] =
+    const [users, students, news, events, programs, volunteers, gallery, content] =
       await Promise.all([
         this.getUserStats(),
         this.getStudentStats(),
         this.getNewsStats(),
         this.getEventStats(),
         this.getProgramStats(),
-        this.getContactStats(),
         this.getVolunteerStats(),
         this.getGalleryStats(),
         this.getContentStats(),
       ]);
 
-    return { users, students, news, events, programs, contacts, volunteers, gallery, content };
+    return { users, students, news, events, programs, volunteers, gallery, content };
   }
 
   private async getUserStats(): Promise<DashboardStats['users']> {
@@ -163,17 +156,6 @@ class DashboardService {
     ]);
 
     return { total, published, upcoming, ongoing, completed };
-  }
-
-  private async getContactStats(): Promise<DashboardStats['contacts']> {
-    const [total, newCount, read, replied] = await Promise.all([
-      Contact.countDocuments(),
-      Contact.countDocuments({ status: 'new' }),
-      Contact.countDocuments({ status: 'read' }),
-      Contact.countDocuments({ status: 'replied' }),
-    ]);
-
-    return { total, newCount, read, replied };
   }
 
   private async getVolunteerStats(): Promise<DashboardStats['volunteers']> {

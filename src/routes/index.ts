@@ -7,15 +7,14 @@ import dashboardRoutes from './dashboardRoutes';
 import programRoutes from './programRoutes';
 import achievementRoutes from './achievementRoutes';
 import faqRoutes from './faqRoutes';
-import resourceRoutes from './resourceRoutes';
 import settingRoutes from './settingRoutes';
-import contactRoutes from './contactRoutes';
 import volunteerRoutes from './volunteerRoutes';
 import galleryRoutes from './galleryRoutes';
 import tickerRoutes from './tickerRoutes';
 import translationRoutes from './translationRoutes';
 import mediaRoutes from './mediaRoutes';
 import uploadRoutes from './uploadRoutes';
+import formRoutes from './formRoutes';
 
 const router = Router();
 
@@ -27,14 +26,13 @@ router.use('/dashboard', dashboardRoutes);
 router.use('/programs', programRoutes);
 router.use('/achievements', achievementRoutes);
 router.use('/faq', faqRoutes);
-router.use('/resources', resourceRoutes);
 router.use('/settings', settingRoutes);
-router.use('/contacts', contactRoutes);
 router.use('/volunteers', volunteerRoutes);
 router.use('/gallery', galleryRoutes);
 router.use('/ticker', tickerRoutes);
 router.use('/translations', translationRoutes);
 router.use('/media', mediaRoutes);
 router.use('/upload', uploadRoutes);
+router.use('/forms', formRoutes);
 
 export default router;

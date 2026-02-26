@@ -35,7 +35,7 @@ export interface IPhoto {
   order: number;
 }
 
-interface IAlbumModel extends Model<IAlbum> {}
+interface IAlbumModel extends Model<IAlbum> { }
 
 /* ----------------------------- Photo Schema ----------------------------- */
 const photoSchema = new Schema<IPhoto>(
@@ -56,9 +56,9 @@ const photoSchema = new Schema<IPhoto>(
 const albumSchema = new Schema<IAlbum, IAlbumModel>(
   {
     title: {
-      ar: { type: String, required: [true, 'Arabic title is required'], trim: true, maxlength: 200 },
-      en: { type: String, required: [true, 'English title is required'], trim: true, maxlength: 200 },
-      tr: { type: String, required: [true, 'Turkish title is required'], trim: true, maxlength: 200 },
+      ar: { type: String, trim: true, maxlength: 200 },
+      en: { type: String, trim: true, maxlength: 200 },
+      tr: { type: String, trim: true, maxlength: 200 },
     },
     slug: {
       type: String,
@@ -74,7 +74,7 @@ const albumSchema = new Schema<IAlbum, IAlbumModel>(
     photos: [photoSchema],
     category: { type: String, trim: true },
     order: { type: Number, default: 0 },
-    isPublished: { type: Boolean, default: false },
+    isPublished: { type: Boolean, default: true },
   },
   {
     timestamps: true,
@@ -90,8 +90,20 @@ albumSchema.index({ isPublished: 1 });
 
 /* ----------------------------- Pre-validate ----------------------------- */
 albumSchema.pre<IAlbum>('validate', function (next) {
-  if (this.title?.en && (!this.slug || this.isModified('title.en'))) {
-    this.slug = createSlug(this.title.en) + '-' + Date.now().toString(36);
+  // If title is not provided, use default with date
+  if (!this.title?.ar && !this.title?.en && !this.title?.tr) {
+    const dateStr = new Date().toLocaleDateString('ar-EG');
+    this.title = {
+      ar: `ألبوم صور - ${dateStr}`,
+      en: `Photo Album - ${new Date().toLocaleDateString('en-US')}`,
+      tr: `Fotoğraf Albümü - ${new Date().toLocaleDateString('tr-TR')}`
+    };
+  }
+
+  if (!this.slug) {
+    // Generate slug from title or timestamp
+    const baseTitle = this.title?.en || this.title?.tr || this.title?.ar || 'album';
+    this.slug = createSlug(baseTitle) + '-' + Date.now().toString(36);
   }
   next();
 });

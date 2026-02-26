@@ -8,6 +8,7 @@ export interface ITicker extends Document {
     tr: string;
   };
   url?: string;
+  image?: string;
   order: number;
   isActive: boolean;
   startDate?: Date;
@@ -27,6 +28,7 @@ const tickerSchema = new Schema<ITicker, ITickerModel>(
       tr: { type: String, required: [true, 'Turkish text is required'], trim: true, maxlength: 300 },
     },
     url: { type: String, trim: true },
+    image: { type: String, trim: true },
     order: { type: Number, default: 0 },
     isActive: { type: Boolean, default: true },
     startDate: { type: Date },
