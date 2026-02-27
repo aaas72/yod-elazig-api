@@ -185,7 +185,7 @@ export const createStudent = asyncHandler(async (req: Request, res: Response) =>
  * @access  Private (admin, editor)
  */
 export const getStudents = asyncHandler(async (req: Request, res: Response) => {
-  const result = await studentService.getAll(req.query as any);
+  const result = await studentService.getAll(req.query as any, req);
   new ApiResponse(HTTP_STATUS.OK, 'Students retrieved', result).send(res);
 });
 
@@ -195,7 +195,7 @@ export const getStudents = asyncHandler(async (req: Request, res: Response) => {
  * @access  Private (admin, editor, own)
  */
 export const getStudent = asyncHandler(async (req: Request, res: Response) => {
-  const student = await studentService.getById(req.params.id as string);
+  const student = await studentService.getById(req.params.id as string, req);
   new ApiResponse(HTTP_STATUS.OK, 'Student retrieved', { student }).send(res);
 });
 

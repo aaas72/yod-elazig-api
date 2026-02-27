@@ -82,7 +82,7 @@ class StudentService {
   /**
    * Get all students with filtering & pagination
    */
-  async getAll(options: PaginationOptions): Promise<PaginatedResult<IStudent>> {
+  async getAll(options: PaginationOptions, req?: any): Promise<PaginatedResult<IStudent>> {
     const {
       page = 1,
       limit = 10,
@@ -116,8 +116,24 @@ class StudentService {
       .skip(skip)
       .limit(limit);
 
+    // Build absolute URL for images
+    const baseUrl = req?.protocol && req?.get ? `${req.protocol}://${req.get('host')}` : '';
+    const studentsWithFullUrls = students.map((student: any) => {
+      const s = student.toObject ? student.toObject() : { ...student };
+      if (s.profileImage && !s.profileImage.startsWith('http')) {
+        s.profileImage = `${baseUrl}${s.profileImage.startsWith('/') ? '' : '/'}${s.profileImage}`;
+      }
+      if (s.studentDocument && !s.studentDocument.startsWith('http')) {
+        s.studentDocument = `${baseUrl}${s.studentDocument.startsWith('/') ? '' : '/'}${s.studentDocument}`;
+      }
+      if (Array.isArray(s.files)) {
+        s.files = s.files.map((f: string) => f && !f.startsWith('http') ? `${baseUrl}${f.startsWith('/') ? '' : '/'}${f}` : f);
+      }
+      return s;
+    });
+
     return {
-      data: students,
+      data: studentsWithFullUrls,
       pagination: {
         total,
         page,
@@ -130,10 +146,22 @@ class StudentService {
   /**
    * Get student by ID
    */
-  async getById(id: string): Promise<IStudent> {
+  async getById(id: string, req?: any): Promise<IStudent> {
     const student = await Student.findById(id);
     if (!student) {
       throw new ApiError(HTTP_STATUS.NOT_FOUND, 'Student not found');
+    }
+    // Build absolute URL for images
+    const baseUrl = req?.protocol && req?.get ? `${req.protocol}://${req.get('host')}` : '';
+    const s = student.toObject ? student.toObject() : { ...student };
+    if (s.profileImage && !s.profileImage.startsWith('http')) {
+      s.profileImage = `${baseUrl}${s.profileImage.startsWith('/') ? '' : '/'}${s.profileImage}`;
+    }
+    if (s.studentDocument && !s.studentDocument.startsWith('http')) {
+      s.studentDocument = `${baseUrl}${s.studentDocument.startsWith('/') ? '' : '/'}${s.studentDocument}`;
+    }
+    if (Array.isArray(s.files)) {
+      s.files = s.files.map((f: string) => f && !f.startsWith('http') ? `${baseUrl}${f.startsWith('/') ? '' : '/'}${f}` : f);
     }
     return student;
   }

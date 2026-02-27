@@ -41,18 +41,23 @@ class NewsService {
       if (translations.ar.summary) data.summary = translations.ar.summary;
     }
 
+    // معالجة coverImage ليكون فقط اسم الملف
+    let coverImage = data.coverImage;
+    if (coverImage && coverImage.includes('/')) {
+      coverImage = coverImage.substring(coverImage.lastIndexOf('/') + 1);
+    }
     const news = await News.create({
       ...data,
+      coverImage,
       author: authorId,
     });
-
     return news.populate('author', 'name email');
   }
 
   /**
    * Get all news with filtering & pagination
    */
-  async getAll(options: PaginationOptions): Promise<NewsPaginatedResult> {
+  async getAll(options: PaginationOptions, req?: any): Promise<NewsPaginatedResult> {
     const {
       page = 1,
       limit = 10,
@@ -88,8 +93,17 @@ class NewsService {
       .skip(skip)
       .limit(limit);
 
+    const baseUrl = req?.protocol && req?.get ? `${req.protocol}://${req.get('host')}` : '';
+    const newsWithFullUrls = news.map((n: any) => {
+      const item = n.toObject ? n.toObject() : { ...n };
+      if (item.coverImage && !item.coverImage.startsWith('http')) {
+        item.coverImage = `${baseUrl}${item.coverImage.startsWith('/') ? '' : '/'}${item.coverImage}`;
+      }
+      return item;
+    });
+
     return {
-      news,
+      news: newsWithFullUrls,
       pagination: {
         total,
         page,
@@ -109,18 +123,23 @@ class NewsService {
   /**
    * Get news by ID
    */
-  async getById(id: string): Promise<INews> {
+  async getById(id: string, req?: any): Promise<any> {
     const news = await News.findById(id).populate('author', 'name email');
     if (!news) {
       throw new ApiError(HTTP_STATUS.NOT_FOUND, 'News article not found');
     }
-    return news;
+    const baseUrl = req?.protocol && req?.get ? `${req.protocol}://${req.get('host')}` : '';
+    const n = news.toObject ? news.toObject() : { ...news };
+    if (n.coverImage && !n.coverImage.startsWith('http')) {
+      n.coverImage = `${baseUrl}${n.coverImage.startsWith('/') ? '' : '/'}${n.coverImage}`;
+    }
+    return n;
   }
 
   /**
    * Get news by slug (public)
    */
-  async getBySlug(slug: string): Promise<INews> {
+  async getBySlug(slug: string, req?: any): Promise<any> {
     const news = await News.findOne({ slug, isPublished: true }).populate(
       'author',
       'name email',
@@ -133,7 +152,12 @@ class NewsService {
     news.views = (news.views || 0) + 1;
     await news.save();
 
-    return news;
+    const baseUrl = req?.protocol && req?.get ? `${req.protocol}://${req.get('host')}` : '';
+    const n = news.toObject ? news.toObject() : { ...news };
+    if (n.coverImage && !n.coverImage.startsWith('http')) {
+      n.coverImage = `${baseUrl}${n.coverImage.startsWith('/') ? '' : '/'}${n.coverImage}`;
+    }
+    return n;
   }
 
   /**

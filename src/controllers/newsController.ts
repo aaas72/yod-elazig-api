@@ -19,7 +19,7 @@ export const createNews = asyncHandler(async (req: Request, res: Response) => {
  * @access  Private (admin, editor)
  */
 export const getAllNews = asyncHandler(async (req: Request, res: Response) => {
-  const result = await newsService.getAll(req.query as any);
+  const result = await newsService.getAll(req.query as any, req);
   new ApiResponse(HTTP_STATUS.OK, 'News retrieved', result).send(res);
 });
 
@@ -29,7 +29,7 @@ export const getAllNews = asyncHandler(async (req: Request, res: Response) => {
  * @access  Public
  */
 export const getPublishedNews = asyncHandler(async (req: Request, res: Response) => {
-  const result = await newsService.getPublished(req.query as any);
+  const result = await newsService.getAll({ ...req.query, isPublished: true }, req);
   new ApiResponse(HTTP_STATUS.OK, 'News retrieved', result).send(res);
 });
 
@@ -39,7 +39,7 @@ export const getPublishedNews = asyncHandler(async (req: Request, res: Response)
  * @access  Private (admin, editor)
  */
 export const getNewsById = asyncHandler(async (req: Request, res: Response) => {
-  const news = await newsService.getById(req.params.id as string);
+  const news = await newsService.getById(req.params.id as string, req);
   new ApiResponse(HTTP_STATUS.OK, 'News retrieved', { news }).send(res);
 });
 
@@ -49,7 +49,7 @@ export const getNewsById = asyncHandler(async (req: Request, res: Response) => {
  * @access  Public
  */
 export const getNewsBySlug = asyncHandler(async (req: Request, res: Response) => {
-  const news = await newsService.getBySlug(req.params.slug as string);
+  const news = await newsService.getBySlug(req.params.slug as string, req);
   new ApiResponse(HTTP_STATUS.OK, 'News retrieved', { news }).send(res);
 });
 

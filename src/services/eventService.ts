@@ -33,11 +33,16 @@ class EventService {
     data: Partial<IEvent> & { title: string; description: string; startDate: Date },
     organizerId: string,
   ): Promise<IEvent> {
+    // معالجة coverImage ليكون فقط اسم الملف
+    let coverImage = data.coverImage;
+    if (coverImage && coverImage.includes('/')) {
+      coverImage = coverImage.substring(coverImage.lastIndexOf('/') + 1);
+    }
     const event = await Event.create({
       ...data,
+      coverImage,
       organizer: organizerId,
     });
-
     return event.populate('organizer', 'name email');
   }
 
