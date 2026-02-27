@@ -25,7 +25,7 @@ router.use(verifyToken);
  */
 router.get(
   '/',
-  authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN),
+  authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.EDITOR),
   dashboardController.getStats,
 );
 

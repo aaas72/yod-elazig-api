@@ -13,7 +13,7 @@ router.post('/', submitVolunteerRules, validate, volunteerController.submitVolun
 router.use(verifyToken);
 
 router.get('/', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN), volunteerController.getAllVolunteers);
-router.get('/stats', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN), volunteerController.getVolunteerStats);
+router.get('/stats', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.EDITOR), volunteerController.getVolunteerStats);
 router.get('/export', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN), volunteerController.exportVolunteers);
 router.get('/:id', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN), volunteerController.getVolunteerById);
 router.patch('/:id/review', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN), reviewVolunteerRules, validate, volunteerController.reviewVolunteer);

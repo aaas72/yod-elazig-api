@@ -73,13 +73,17 @@ userSchema.index({ role: 1 });
 
 /* ----------------------------- Pre-save ----------------------------- */
 userSchema.pre<IUser>('save', async function (next) {
-  if (!this.isModified('password')) return next();
+  if (!this.isModified('password')) {
+    next();
+    return undefined;
+  }
   const salt = await bcrypt.genSalt(12);
   this.password = await bcrypt.hash(this.password, salt);
   if (!this.isNew) {
     this.passwordChangedAt = new Date(Date.now() - 1000);
   }
   next();
+  return undefined;
 });
 
 /* ----------------------------- Methods ----------------------------- */

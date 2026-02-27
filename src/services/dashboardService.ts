@@ -9,6 +9,7 @@ interface DashboardStats {
     students: number;
     active: number;
     inactive: number;
+    byRole: Record<string, number>;
   };
   students: {
     total: number;
@@ -31,9 +32,11 @@ interface DashboardStats {
   programs: {
     total: number;
     published: number;
-    upcoming: number;
-    ongoing: number;
-    completed: number;
+    byStatus: {
+      upcoming: number;
+      ongoing: number;
+      completed: number;
+    };
   };
   volunteers: {
     total: number;
@@ -56,6 +59,7 @@ class DashboardService {
    * Get full dashboard statistics
    */
   async getStats(): Promise<DashboardStats> {
+    // ensure programs.byStatus included in type
     const [users, students, news, events, programs, volunteers, gallery, content] =
       await Promise.all([
         this.getUserStats(),
@@ -80,6 +84,15 @@ class DashboardService {
       User.countDocuments({ isActive: true }),
     ]);
 
+    // also compute breakdown by each role value found in ROLES
+    const roles = Object.values(ROLES);
+    const byRole: Record<string, number> = {};
+    await Promise.all(
+      roles.map(async (r) => {
+        byRole[r] = await User.countDocuments({ role: r });
+      })
+    );
+
     return {
       total,
       admins,
@@ -87,6 +100,7 @@ class DashboardService {
       students,
       active,
       inactive: total - active,
+      byRole,
     };
   }
 
@@ -155,7 +169,11 @@ class DashboardService {
       Program.countDocuments({ status: 'completed' }),
     ]);
 
-    return { total, published, upcoming, ongoing, completed };
+    return {
+      total,
+      published,
+      byStatus: { upcoming, ongoing, completed },
+    } as any; // casting until interface updated below
   }
 
   private async getVolunteerStats(): Promise<DashboardStats['volunteers']> {

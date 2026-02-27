@@ -1,5 +1,6 @@
 export { default as authService } from './authService';
 export { studentService } from './studentService';
+export { default as userService } from './userService';
 export { default as newsService } from './newsService';
 export { default as eventService } from './eventService';
 export { default as dashboardService } from './dashboardService';
@@ -12,3 +13,4 @@ export { default as galleryService } from './galleryService';
 export { default as tickerService } from './tickerService';
 export { default as translationService } from './translationService';
 export { default as mediaService } from './mediaService';
+export { default as userService } from './userService';
