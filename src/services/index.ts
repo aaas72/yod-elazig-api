@@ -13,4 +13,3 @@ export { default as galleryService } from './galleryService';
 export { default as tickerService } from './tickerService';
 export { default as translationService } from './translationService';
 export { default as mediaService } from './mediaService';
-export { default as userService } from './userService';
