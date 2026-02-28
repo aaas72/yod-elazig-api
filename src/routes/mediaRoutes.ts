@@ -8,7 +8,7 @@ import { ROLES } from '../constants';
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB max
+    fileSize: 1 * 1024 * 1024, // 1MB max
   },
   fileFilter: (_req, file, cb) => {
     const allowedMimes = [

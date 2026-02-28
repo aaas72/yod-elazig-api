@@ -8,7 +8,7 @@ import { HTTP_STATUS, ROLES } from '../constants';
 /* ── Multer config — memory storage for sharp processing ────────── */
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 2 * 1024 * 1024 }, // 2 MB server-side safeguard
+  limits: { fileSize: 1 * 1024 * 1024 }, // 1 MB server-side safeguard
   fileFilter: (_req, file, cb) => {
     const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
     if (allowed.includes(file.mimetype)) {

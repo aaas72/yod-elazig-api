@@ -45,7 +45,6 @@ class MediaService {
     const filePath = path.join(folderDir, filename);
     let thumbnailUrl: string | undefined;
 
-    // Process image
     if (file.mimetype.startsWith('image/')) {
       if (file.mimetype === 'image/png') {
         await sharp(file.buffer)
@@ -78,6 +77,18 @@ class MediaService {
 
         thumbnailUrl = `/uploads/thumbnails/${thumbFilename}`;
       }
+    // حفظ الصورة الأصلية كما هي بدون ضغط أو تغيير أبعاد
+    await fs.promises.writeFile(filePath, file.buffer);
+
+    // إنشاء صورة مصغرة (thumbnail) فقط للعرض السريع، يمكن إبقاؤها مضغوطة
+    const thumbFilename = `thumb_${filename}`;
+    const thumbPath = path.join(THUMB_DIR, thumbFilename);
+    await sharp(file.buffer)
+      .resize(300, 300, { fit: 'cover' })
+      .jpeg({ quality: 70 })
+      .toFile(thumbPath);
+
+    thumbnailUrl = `/uploads/thumbnails/${thumbFilename}`;
     } else {
       // Non-image file: write directly
       fs.writeFileSync(filePath, file.buffer);
