@@ -31,8 +31,14 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // ── Static files (uploads) ───────────────────────────
 const uploadDir = process.env.UPLOAD_DIR || 'uploads';
-app.use(`/${uploadDir}`, express.static(path.join(process.cwd(), uploadDir)));
-app.use(express.static('public'));
+app.use(`/${uploadDir}`, express.static(path.join(process.cwd(), uploadDir), {
+  maxAge: '7d',               // Cache uploads for 7 days
+  immutable: false,
+}));
+app.use(express.static('public', {
+  maxAge: '30d',               // Cache public assets for 30 days
+  immutable: false,
+}));
 
 // ── Accept-Language middleware (i18n) ────────────────
 app.use((req: Request, _res: Response, next: NextFunction) => {

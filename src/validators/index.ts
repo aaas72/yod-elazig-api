@@ -28,4 +28,5 @@ export { createFAQRules, updateFAQRules, reorderFAQRules } from './faqValidator'
 export { submitVolunteerRules, reviewVolunteerRules } from './volunteerValidator';
 export { createAlbumRules, updateAlbumRules, addPhotosRules } from './galleryValidator';
 export { createTickerRules, updateTickerRules } from './tickerValidator';
+export { createReportRules, updateReportRules } from './reportValidator';
 export { upsertTranslationRules, bulkTranslationRules } from './translationValidator';

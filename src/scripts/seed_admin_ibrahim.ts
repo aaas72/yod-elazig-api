@@ -1,6 +1,10 @@
+import dotenv from 'dotenv';
+import path from 'path';
 import mongoose from 'mongoose';
 import User from '../models/User';
-import 'dotenv/config';
+
+const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development';
+dotenv.config({ path: path.resolve(__dirname, '../..', envFile) });
 
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/yod-elazig';
 

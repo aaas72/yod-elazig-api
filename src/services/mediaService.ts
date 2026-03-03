@@ -31,11 +31,19 @@ class MediaService {
 
   async upload(
     file: Express.Multer.File,
-    userId: string,
+    userId?: string,
     folder: string = 'general',
     alt?: string,
   ): Promise<IMedia> {
-    const ext = path.extname(file.originalname);
+    let ext = path.extname(file.originalname);
+    // Ensure extension if missing
+    if (!ext || ext === '.') {
+        if (file.mimetype === 'image/png') ext = '.png';
+        else if (file.mimetype === 'image/jpeg') ext = '.jpg';
+        else if (file.mimetype === 'image/webp') ext = '.webp';
+        else if (file.mimetype === 'image/gif') ext = '.gif';
+    }
+
     const filename = `${Date.now()}-${Math.random().toString(36).substring(2)}${ext}`;
 
     // Ensure folder directory exists
@@ -77,18 +85,6 @@ class MediaService {
 
         thumbnailUrl = `/uploads/thumbnails/${thumbFilename}`;
       }
-    // حفظ الصورة الأصلية كما هي بدون ضغط أو تغيير أبعاد
-    await fs.promises.writeFile(filePath, file.buffer);
-
-    // إنشاء صورة مصغرة (thumbnail) فقط للعرض السريع، يمكن إبقاؤها مضغوطة
-    const thumbFilename = `thumb_${filename}`;
-    const thumbPath = path.join(THUMB_DIR, thumbFilename);
-    await sharp(file.buffer)
-      .resize(300, 300, { fit: 'cover' })
-      .jpeg({ quality: 70 })
-      .toFile(thumbPath);
-
-    thumbnailUrl = `/uploads/thumbnails/${thumbFilename}`;
     } else {
       // Non-image file: write directly
       fs.writeFileSync(filePath, file.buffer);

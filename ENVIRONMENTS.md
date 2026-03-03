@@ -1,8 +1,8 @@
 # Development Environment
-cp .env.development .env
 npm run dev
+# يتم تحميل .env.development تلقائياً
 
 # Production Environment
-cp .env.production .env
-npm run build
-npm start
+NODE_ENV=production npm run build
+NODE_ENV=production npm start
+# يتم تحميل .env.production تلقائياً

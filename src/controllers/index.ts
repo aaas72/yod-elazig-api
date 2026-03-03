@@ -13,3 +13,4 @@ export * as tickerController from './tickerController';
 export * as translationController from './translationController';
 export * as mediaController from './mediaController';
 export * as formController from './formController';
+export * as reportController from './reportController';

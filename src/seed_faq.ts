@@ -5,7 +5,8 @@ import path from 'path';
 import FAQ from './models/FAQ';
 
 // Load env
-dotenv.config({ path: path.join(__dirname, '../.env') });
+const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env.development';
+dotenv.config({ path: path.join(__dirname, '..', envFile) });
 
 const faqData = {
   "categories": [

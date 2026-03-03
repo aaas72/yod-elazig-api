@@ -16,6 +16,7 @@ import translationRoutes from './translationRoutes';
 import mediaRoutes from './mediaRoutes';
 import uploadRoutes from './uploadRoutes';
 import formRoutes from './formRoutes';
+import reportRoutes from './reportRoutes';
 
 const router = Router();
 
@@ -36,5 +37,6 @@ router.use('/translations', translationRoutes);
 router.use('/media', mediaRoutes);
 router.use('/upload', uploadRoutes);
 router.use('/forms', formRoutes);
+router.use('/reports', reportRoutes);
 
 export default router;

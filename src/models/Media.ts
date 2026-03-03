@@ -10,7 +10,7 @@ export interface IMedia extends Document {
   thumbnailUrl?: string;
   alt?: string;
   folder?: string;
-  uploadedBy: mongoose.Types.ObjectId;
+  uploadedBy?: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -48,7 +48,7 @@ const mediaSchema = new Schema<IMedia, IMediaModel>(
     uploadedBy: {
       type: Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
+      required: false,
     },
   },
   {

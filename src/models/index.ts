@@ -42,3 +42,6 @@ export type { IForm } from './Form';
 
 export { default as FormSubmission } from './FormSubmission';
 export type { IFormSubmission } from './FormSubmission';
+
+export { default as Report } from './Report';
+export type { IReport } from './Report';
