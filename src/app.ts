@@ -1,5 +1,6 @@
 import path from 'path';
 import express, { Application, Request, Response, NextFunction } from 'express';
+import compression from 'compression';
 import helmet from 'helmet';
 import cors from 'cors';
 import morgan from 'morgan';
@@ -15,6 +16,9 @@ import routes from './routes';
 import { logger } from './utils';
 
 const app: Application = express();
+
+// ── Compression (gzip/brotli) ────────────────────────
+app.use(compression());
 
 // ── Security middleware ──────────────────────────────
 app.use(helmet({

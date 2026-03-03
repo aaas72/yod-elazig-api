@@ -16,14 +16,20 @@ FROM node:18-alpine
 
 WORKDIR /app
 
+# Set production environment
+ENV NODE_ENV=production
+
 COPY package*.json ./
 RUN npm ci --only=production
 
 # Copy compiled JS from builder
 COPY --from=builder /app/dist ./dist
 
-# Create logs directory
-RUN mkdir -p logs
+# Copy production env file
+COPY .env.production ./
+
+# Create logs and uploads directories
+RUN mkdir -p logs uploads
 
 # Expose port
 EXPOSE 5000
