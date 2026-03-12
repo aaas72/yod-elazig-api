@@ -12,11 +12,9 @@ export default function authorizePermission<
 >(resource: R, action: A) {
   return (req: Request, res: Response, next: NextFunction) => {
     const user = req.user;
-    console.log('[authorizePermission] user:', user, 'resource:', resource, 'action:', action);
     if (!user) return res.status(401).json({ message: 'غير مصرح. يجب تسجيل الدخول.' });
     const allowed = PERMISSIONS[resource]?.[action] as string[] | undefined;
     if (!allowed) {
-      console.log('[authorizePermission] Permission config error for resource:', resource, 'action:', action);
       return res.status(403).json({ message: 'خطأ في إعدادات الصلاحيات. يرجى مراجعة الإدارة.' });
     }
     if (!allowed.includes(user.role)) {
@@ -28,10 +26,8 @@ export default function authorizePermission<
       } else if (resource === 'news' || resource === 'events') {
         msg = 'هذه العملية متاحة فقط للمحررين أو الإدارة.';
       }
-      console.log('[authorizePermission] Forbidden for role:', user.role, 'allowed:', allowed);
       return res.status(403).json({ message: msg });
     }
-    console.log('[authorizePermission] Access granted for user:', user._id, 'role:', user.role);
     return next();
   };
 }

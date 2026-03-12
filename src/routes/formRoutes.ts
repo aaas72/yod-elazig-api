@@ -20,7 +20,6 @@ const handleUpload = (req: any, res: any, next: any) => {
     uploadMiddleware(req, res, (err) => {
         if (err) {
             // Handle Multer errors (e.g., file type, size limit)
-            console.error('Multer Error:', err);
             return res.status(422).json({
                 success: false,
                 message: err.message || 'File upload error',

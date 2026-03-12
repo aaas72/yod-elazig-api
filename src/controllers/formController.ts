@@ -52,10 +52,6 @@ export const getFormBySlug = asyncHandler(async (req: Request, res: Response) =>
 });
 
 export const submitForm = asyncHandler(async (req: Request, res: Response) => {
-  // Debug log to inspect incoming request
-  console.log('Submit Form Body:', req.body);
-  console.log('Submit Form Files:', req.files);
-
   let { formId, data } = req.body;
 
   // Fallback: if formId is not directly in body, try to find it in data if it's parsed
@@ -114,7 +110,7 @@ export const submitForm = asyncHandler(async (req: Request, res: Response) => {
       // For now, let's try to save both if they differ, or just fix it.
       // The safest way is to check if the fixed version differs.
 
-      let fieldName = file.fieldname;
+      const fieldName = file.fieldname;
       // Attempt to fix encoding if it looks like latin1
       // Note: This is heuristic. If your system is already UTF-8, this might break it.
       // But given the issue, it's likely needed.

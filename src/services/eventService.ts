@@ -33,10 +33,11 @@ class EventService {
     data: Partial<IEvent> & { title: string; description: string; startDate: Date },
     organizerId: string,
   ): Promise<IEvent> {
-    // معالجة coverImage ليكون فقط اسم الملف
+    // معالجة coverImage: الاحتفاظ بالمسار النسبي /uploads/... فقط
     let coverImage = data.coverImage;
-    if (coverImage && coverImage.includes('/')) {
-      coverImage = coverImage.substring(coverImage.lastIndexOf('/') + 1);
+    if (coverImage?.startsWith('http')) {
+      const match = coverImage.match(/(\/uploads\/.+)/);
+      coverImage = match ? match[1] : coverImage.substring(coverImage.lastIndexOf('/') + 1);
     }
     const event = await Event.create({
       ...data,
@@ -143,6 +144,12 @@ class EventService {
 
     if (data.title && data.title !== event.title) {
       data.slug = createSlug(data.title);
+    }
+
+    // معالجة coverImage: الاحتفاظ بالمسار النسبي /uploads/... فقط
+    if (data.coverImage?.startsWith('http')) {
+      const match = data.coverImage.match(/(\/uploads\/.+)/);
+      data.coverImage = match ? match[1] : data.coverImage.substring(data.coverImage.lastIndexOf('/') + 1);
     }
 
     Object.assign(event, data);

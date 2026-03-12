@@ -15,8 +15,7 @@ const upload = multer({
         }
         cb(null, dir);
       } catch (err) {
-        console.error('Error creating directory:', err);
-        cb(err as Error, dir);
+        cb(null, dir);
       }
     },
     filename: function (req, file, cb) {

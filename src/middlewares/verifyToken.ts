@@ -17,17 +17,14 @@ const verifyToken = async (req: Request, _res: Response, next: NextFunction): Pr
     }
 
     if (!token) {
-      console.log('[verifyToken] No token provided');
       return next(new ApiError(HTTP_STATUS.UNAUTHORIZED, 'Access denied. No token provided.'));
     }
 
     // 2) Verify token
     const decoded = verifyAccessToken(token);
-    console.log('[verifyToken] Decoded token:', decoded);
 
     // 3) Check if user still exists
     const user = await User.findById(decoded.id).select('+password');
-    console.log('[verifyToken] DB user:', user);
     if (!user) {
       return next(new ApiError(HTTP_STATUS.UNAUTHORIZED, 'User belonging to this token no longer exists.'));
     }
@@ -44,7 +41,6 @@ const verifyToken = async (req: Request, _res: Response, next: NextFunction): Pr
 
     // 6) Grant access
     req.user = user;
-    console.log('[verifyToken] req.user set:', req.user);
     next();
   } catch (error) {
     if ((error as Error).name === 'JsonWebTokenError') {

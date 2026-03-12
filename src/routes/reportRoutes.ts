@@ -11,7 +11,8 @@ import { logger } from '../utils';
 const upload = multer({
   storage: multer.diskStorage({
     destination: function (_req, _file, cb) {
-      const dir = 'uploads/reports';
+      const today = new Date().toISOString().slice(0, 10);
+      const dir = `uploads/reports/${today}`;
       try {
         if (!fs.existsSync(dir)) {
           fs.mkdirSync(dir, { recursive: true });

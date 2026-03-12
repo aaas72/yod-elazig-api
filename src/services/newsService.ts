@@ -41,10 +41,11 @@ class NewsService {
       if (translations.ar.summary) data.summary = translations.ar.summary;
     }
 
-    // معالجة coverImage ليكون فقط اسم الملف
+    // معالجة coverImage: الاحتفاظ بالمسار النسبي /uploads/... فقط
     let coverImage = data.coverImage;
-    if (coverImage && coverImage.includes('/')) {
-      coverImage = coverImage.substring(coverImage.lastIndexOf('/') + 1);
+    if (coverImage?.startsWith('http')) {
+      const match = coverImage.match(/(\/uploads\/.+)/);
+      coverImage = match ? match[1] : coverImage.substring(coverImage.lastIndexOf('/') + 1);
     }
     const news = await News.create({
       ...data,
@@ -180,6 +181,12 @@ class NewsService {
     // Regenerate slug if title changed
     if (data.title && data.title !== news.title) {
       data.slug = createSlug(data.title);
+    }
+
+    // معالجة coverImage: الاحتفاظ بالمسار النسبي /uploads/... فقط
+    if (data.coverImage?.startsWith('http')) {
+      const match = data.coverImage.match(/(\/uploads\/.+)/);
+      data.coverImage = match ? match[1] : data.coverImage.substring(data.coverImage.lastIndexOf('/') + 1);
     }
 
     Object.assign(news, data);

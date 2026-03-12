@@ -36,16 +36,26 @@ class GalleryService {
     const total = await Album.countDocuments(filter);
     const data = await Album.find(filter).sort(sort).skip(skip).limit(limitNum);
 
+    // إعادة بناء المسار النسبي /uploads/... بدلاً من الاسم فقط
+    const toRelative = (url?: string) => {
+      if (!url) return '';
+      if (url.startsWith('http')) {
+        const match = url.match(/(\/uploads\/.+)/);
+        return match ? match[1] : url.split('/').pop() || '';
+      }
+      return url;
+    };
+
     // إرجاع فقط اسم الملف بدون أي مسار أو baseUrl
     const albums = data.map(album => {
       const a = album.toObject();
       if (a.coverImage) {
-        a.coverImage = a.coverImage ? a.coverImage.split('/').pop() || '' : '';
+        a.coverImage = toRelative(a.coverImage);
       }
       if (a.photos && Array.isArray(a.photos)) {
         a.photos = a.photos.map((p: IPhoto) => {
-          const url = p.url ? (p.url.split('/').pop() as string) : '';
-          const thumbnail = p.thumbnail ? (p.thumbnail.split('/').pop() as string) : '';
+          const url = toRelative(p.url);
+          const thumbnail = toRelative(p.thumbnail);
           return { ...p, url, thumbnail };
         });
       }
@@ -67,15 +77,23 @@ class GalleryService {
     const filter: FilterQuery<IAlbum> = { isPublished: true };
     if (category) filter.category = category;
     const data = await Album.find(filter).sort('order');
+    const toRelative = (url?: string) => {
+      if (!url) return '';
+      if (url.startsWith('http')) {
+        const match = url.match(/(\/uploads\/.+)/);
+        return match ? match[1] : url.split('/').pop() || '';
+      }
+      return url;
+    };
     return data.map(album => {
       const a = album.toObject();
       if (a.coverImage) {
-        a.coverImage = a.coverImage ? a.coverImage.split('/').pop() || '' : '';
+        a.coverImage = toRelative(a.coverImage);
       }
       if (a.photos && Array.isArray(a.photos)) {
         a.photos = a.photos.map((p: IPhoto) => {
-          const url = p.url ? (p.url.split('/').pop() as string) : '';
-          const thumbnail = p.thumbnail ? (p.thumbnail.split('/').pop() as string) : '';
+          const url = toRelative(p.url);
+          const thumbnail = toRelative(p.thumbnail);
           return { ...p, url, thumbnail };
         });
       }
@@ -87,13 +105,19 @@ class GalleryService {
     const album = await Album.findById(id);
     if (!album) throw new ApiError(HTTP_STATUS.NOT_FOUND, 'Album not found');
     const a = album.toObject();
-    if (a.coverImage) {
-      a.coverImage = a.coverImage ? a.coverImage.split('/').pop() || '' : '';
-    }
+    const toRelative = (url?: string) => {
+      if (!url) return '';
+      if (url.startsWith('http')) {
+        const match = url.match(/(\/uploads\/.+)/);
+        return match ? match[1] : url.split('/').pop() || '';
+      }
+      return url;
+    };
+    if (a.coverImage) a.coverImage = toRelative(a.coverImage);
     if (a.photos && Array.isArray(a.photos)) {
       a.photos = a.photos.map((p: IPhoto) => {
-        const url = p.url ? (p.url.split('/').pop() as string) : '';
-        const thumbnail = p.thumbnail ? (p.thumbnail.split('/').pop() as string) : '';
+        const url = toRelative(p.url);
+        const thumbnail = toRelative(p.thumbnail);
         return { ...p, url, thumbnail };
       });
     }
@@ -104,13 +128,19 @@ class GalleryService {
     const album = await Album.findOne({ slug, isPublished: true });
     if (!album) throw new ApiError(HTTP_STATUS.NOT_FOUND, 'Album not found');
     const a = album.toObject();
-    if (a.coverImage) {
-      a.coverImage = a.coverImage ? a.coverImage.split('/').pop() || '' : '';
-    }
+    const toRelative = (url?: string) => {
+      if (!url) return '';
+      if (url.startsWith('http')) {
+        const match = url.match(/(\/uploads\/.+)/);
+        return match ? match[1] : url.split('/').pop() || '';
+      }
+      return url;
+    };
+    if (a.coverImage) a.coverImage = toRelative(a.coverImage);
     if (a.photos && Array.isArray(a.photos)) {
       a.photos = a.photos.map((p: IPhoto) => {
-        const url = p.url ? (p.url.split('/').pop() as string) : '';
-        const thumbnail = p.thumbnail ? (p.thumbnail.split('/').pop() as string) : '';
+        const url = toRelative(p.url);
+        const thumbnail = toRelative(p.thumbnail);
         return { ...p, url, thumbnail };
       });
     }

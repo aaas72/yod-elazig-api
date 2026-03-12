@@ -46,12 +46,18 @@ class MediaService {
 
     const filename = `${Date.now()}-${Math.random().toString(36).substring(2)}${ext}`;
 
+    // Use folder as provided (client controls entity-based path)
+    const subFolder = folder;
+
     // Ensure folder directory exists
-    const folderDir = path.join(UPLOAD_DIR, folder);
+    const folderDir = path.join(UPLOAD_DIR, subFolder);
     if (!fs.existsSync(folderDir)) fs.mkdirSync(folderDir, { recursive: true });
 
     const filePath = path.join(folderDir, filename);
     let thumbnailUrl: string | undefined;
+
+    // Always ensure thumbnail directory exists before writing
+    if (!fs.existsSync(THUMB_DIR)) fs.mkdirSync(THUMB_DIR, { recursive: true });
 
     if (file.mimetype.startsWith('image/')) {
       if (file.mimetype === 'image/png') {
@@ -95,7 +101,7 @@ class MediaService {
       originalName: file.originalname,
       mimetype: file.mimetype,
       size: file.size,
-      url: `/uploads/${folder}/${filename}`,
+      url: `/uploads/${subFolder}/${filename}`,
       thumbnailUrl,
       alt,
       folder,
