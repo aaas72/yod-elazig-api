@@ -6,7 +6,6 @@ import cors from 'cors';
 import morgan from 'morgan';
 import mongoSanitize from 'express-mongo-sanitize';
 import hpp from 'hpp';
-import xss from 'xss-clean';
 import swaggerUi from 'swagger-ui-express';
 
 import corsOptions from './config/cors';
@@ -27,7 +26,8 @@ app.use(helmet({
 app.use(cors(corsOptions));
 app.use(mongoSanitize());
 app.use(hpp());
-app.use(xss());
+// Note: xss-clean removed globally because RichTextEditor sends valid HTML content.
+// XSS protection is handled by helmet headers (CSP) and output encoding on the client.
 
 // ── Body parsers ─────────────────────────────────────
 app.use(express.json({ limit: '10mb' }));
