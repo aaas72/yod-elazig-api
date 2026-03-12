@@ -6,6 +6,8 @@ export interface ITranslation {
   title: string;
   content: string;
   summary: string;
+  category?: string;
+  tags?: string[];
 }
 
 /* ----------------------------- Interface ----------------------------- */
@@ -94,16 +96,22 @@ const newsSchema = new Schema<INews, INewsModel>(
         title: { type: String, default: '' },
         content: { type: String, default: '' },
         summary: { type: String, default: '' },
+        category: { type: String, default: '' },
+        tags: [{ type: String, trim: true }],
       },
       en: {
         title: { type: String, default: '' },
         content: { type: String, default: '' },
         summary: { type: String, default: '' },
+        category: { type: String, default: '' },
+        tags: [{ type: String, trim: true }],
       },
       tr: {
         title: { type: String, default: '' },
         content: { type: String, default: '' },
         summary: { type: String, default: '' },
+        category: { type: String, default: '' },
+        tags: [{ type: String, trim: true }],
       },
     },
   },

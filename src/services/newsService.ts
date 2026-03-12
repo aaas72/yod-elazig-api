@@ -33,12 +33,14 @@ class NewsService {
     data: Partial<INews> & { title: string; content: string },
     authorId: string,
   ): Promise<INews> {
-    // Sync translations.ar with top-level title/content/summary
+    // Sync translations.ar with top-level title/content/summary/category/tags
     const translations = data.translations;
     if (translations?.ar) {
       if (translations.ar.title) data.title = translations.ar.title;
       if (translations.ar.content) data.content = translations.ar.content;
       if (translations.ar.summary) data.summary = translations.ar.summary;
+      if (translations.ar.category) data.category = translations.ar.category;
+      if (translations.ar.tags?.length) data.tags = translations.ar.tags;
     }
 
     // معالجة coverImage: الاحتفاظ بالمسار النسبي /uploads/... فقط
@@ -170,12 +172,14 @@ class NewsService {
       throw new ApiError(HTTP_STATUS.NOT_FOUND, 'News article not found');
     }
 
-    // Sync translations.ar with top-level title/content/summary
+    // Sync translations.ar with top-level title/content/summary/category/tags
     const translations = data.translations;
     if (translations?.ar) {
       if (translations.ar.title) data.title = translations.ar.title;
       if (translations.ar.content) data.content = translations.ar.content;
       if (translations.ar.summary) data.summary = translations.ar.summary;
+      if (translations.ar.category) data.category = translations.ar.category;
+      if (translations.ar.tags?.length) data.tags = translations.ar.tags;
     }
 
     // Regenerate slug if title changed

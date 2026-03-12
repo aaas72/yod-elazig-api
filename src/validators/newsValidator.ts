@@ -41,12 +41,21 @@ export const createNewsRules: ValidationChain[] = [
   body('translations.ar.title').optional().trim(),
   body('translations.ar.content').optional().trim(),
   body('translations.ar.summary').optional().trim(),
+  body('translations.ar.category').optional().trim(),
+  body('translations.ar.tags').optional().isArray().withMessage('Tags must be an array'),
+  body('translations.ar.tags.*').optional().trim().isString(),
   body('translations.en.title').optional().trim(),
   body('translations.en.content').optional().trim(),
   body('translations.en.summary').optional().trim(),
+  body('translations.en.category').optional().trim(),
+  body('translations.en.tags').optional().isArray().withMessage('Tags must be an array'),
+  body('translations.en.tags.*').optional().trim().isString(),
   body('translations.tr.title').optional().trim(),
   body('translations.tr.content').optional().trim(),
   body('translations.tr.summary').optional().trim(),
+  body('translations.tr.category').optional().trim(),
+  body('translations.tr.tags').optional().isArray().withMessage('Tags must be an array'),
+  body('translations.tr.tags.*').optional().trim().isString(),
 ];
 
 /** Update a news article */

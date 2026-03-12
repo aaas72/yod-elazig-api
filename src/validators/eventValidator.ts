@@ -38,6 +38,24 @@ export const createEventRules: ValidationChain[] = [
   body('registrationDeadline')
     .optional()
     .isISO8601().withMessage('Registration deadline must be a valid ISO 8601 date'),
+  body('translations')
+    .optional()
+    .isObject().withMessage('translations must be an object'),
+  body('translations.ar.title').optional().trim(),
+  body('translations.ar.description').optional().trim(),
+  body('translations.ar.location').optional().trim(),
+  body('translations.ar.tags').optional().isArray(),
+  body('translations.ar.tags.*').optional().trim().isString(),
+  body('translations.en.title').optional().trim(),
+  body('translations.en.description').optional().trim(),
+  body('translations.en.location').optional().trim(),
+  body('translations.en.tags').optional().isArray(),
+  body('translations.en.tags.*').optional().trim().isString(),
+  body('translations.tr.title').optional().trim(),
+  body('translations.tr.description').optional().trim(),
+  body('translations.tr.location').optional().trim(),
+  body('translations.tr.tags').optional().isArray(),
+  body('translations.tr.tags.*').optional().trim().isString(),
 ];
 
 /** Update an event */
@@ -78,4 +96,20 @@ export const updateEventRules: ValidationChain[] = [
   body('registrationDeadline')
     .optional()
     .isISO8601().withMessage('Registration deadline must be a valid ISO 8601 date'),
+  body('translations').optional().isObject(),
+  body('translations.ar.title').optional().trim(),
+  body('translations.ar.description').optional().trim(),
+  body('translations.ar.location').optional().trim(),
+  body('translations.ar.tags').optional().isArray(),
+  body('translations.ar.tags.*').optional().trim().isString(),
+  body('translations.en.title').optional().trim(),
+  body('translations.en.description').optional().trim(),
+  body('translations.en.location').optional().trim(),
+  body('translations.en.tags').optional().isArray(),
+  body('translations.en.tags.*').optional().trim().isString(),
+  body('translations.tr.title').optional().trim(),
+  body('translations.tr.description').optional().trim(),
+  body('translations.tr.location').optional().trim(),
+  body('translations.tr.tags').optional().isArray(),
+  body('translations.tr.tags.*').optional().trim().isString(),
 ];

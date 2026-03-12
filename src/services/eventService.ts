@@ -33,6 +33,14 @@ class EventService {
     data: Partial<IEvent> & { title: string; description: string; startDate: Date },
     organizerId: string,
   ): Promise<IEvent> {
+    // مزامنة translations.ar مع الحقول الرئيسية
+    const translations = (data as Partial<IEvent> & { translations?: Record<string, Record<string, unknown>> }).translations;
+    if (translations?.ar) {
+      if (translations.ar.title) data.title = translations.ar.title as string;
+      if (translations.ar.description) data.description = translations.ar.description as string;
+      if (translations.ar.location) data.location = translations.ar.location as string;
+      if ((translations.ar.tags as string[])?.length) data.tags = translations.ar.tags as string[];
+    }
     // معالجة coverImage: الاحتفاظ بالمسار النسبي /uploads/... فقط
     let coverImage = data.coverImage;
     if (coverImage?.startsWith('http')) {
@@ -144,6 +152,15 @@ class EventService {
 
     if (data.title && data.title !== event.title) {
       data.slug = createSlug(data.title);
+    }
+
+    // مزامنة translations.ar مع الحقول الرئيسية
+    const translations = (data as Partial<IEvent> & { translations?: Record<string, Record<string, unknown>> }).translations;
+    if (translations?.ar) {
+      if (translations.ar.title) data.title = translations.ar.title as string;
+      if (translations.ar.description) data.description = translations.ar.description as string;
+      if (translations.ar.location) data.location = translations.ar.location as string;
+      if ((translations.ar.tags as string[])?.length) data.tags = translations.ar.tags as string[];
     }
 
     // معالجة coverImage: الاحتفاظ بالمسار النسبي /uploads/... فقط

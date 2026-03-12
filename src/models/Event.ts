@@ -18,6 +18,11 @@ export interface IEvent extends Document {
   isPublished: boolean;
   registrationDeadline?: Date;
   isUpcoming: boolean; // virtual
+  translations: {
+    ar: { title?: string; description?: string; location?: string; tags?: string[] };
+    en: { title?: string; description?: string; location?: string; tags?: string[] };
+    tr: { title?: string; description?: string; location?: string; tags?: string[] };
+  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -88,6 +93,26 @@ const eventSchema = new Schema<IEvent, IEventModel>(
     },
     registrationDeadline: {
       type: Date,
+    },
+    translations: {
+      ar: {
+        title: { type: String, default: '' },
+        description: { type: String, default: '' },
+        location: { type: String, default: '' },
+        tags: [{ type: String, trim: true }],
+      },
+      en: {
+        title: { type: String, default: '' },
+        description: { type: String, default: '' },
+        location: { type: String, default: '' },
+        tags: [{ type: String, trim: true }],
+      },
+      tr: {
+        title: { type: String, default: '' },
+        description: { type: String, default: '' },
+        location: { type: String, default: '' },
+        tags: [{ type: String, trim: true }],
+      },
     },
   },
   {
