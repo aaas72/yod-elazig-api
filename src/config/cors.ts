@@ -24,7 +24,8 @@ const corsOptions: CorsOptions = {
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Accept-Language', 'Origin', 'X-Requested-With'],
+  exposedHeaders: ['Content-Length', 'Content-Type'],
   maxAge: 86400, // 24 h preflight cache
 };
 
