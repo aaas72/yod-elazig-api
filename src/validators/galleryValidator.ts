@@ -9,6 +9,7 @@ export const createAlbumRules: ValidationChain[] = [
   body('description.tr').optional().trim(),
   body('coverImage').optional().trim(),
   body('category').optional().trim(),
+  body('type').optional().isIn(['public', 'private']).withMessage('Type must be public or private'),
   body('order').optional().isInt({ min: 0 }),
   body('isPublished').optional().isBoolean(),
 ];
@@ -22,6 +23,7 @@ export const updateAlbumRules: ValidationChain[] = [
   body('description.tr').optional().trim(),
   body('coverImage').optional().trim(),
   body('category').optional().trim(),
+  body('type').optional().isIn(['public', 'private']).withMessage('Type must be public or private'),
   body('order').optional().isInt({ min: 0 }),
   body('isPublished').optional().isBoolean(),
 ];

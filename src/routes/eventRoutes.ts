@@ -5,6 +5,7 @@ import { createEventRules, updateEventRules } from '../validators';
 import { ROLES } from '../constants';
 
 const router = Router();
+const OBJECT_ID = ':id([0-9a-fA-F]{24})';
 
 /**
  * @swagger
@@ -71,7 +72,7 @@ router.get(
  *       - bearerAuth: []
  */
 router.get(
-  '/:id',
+  `/${OBJECT_ID}`,
   authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.EDITOR),
   eventController.getEventById,
 );
@@ -103,7 +104,7 @@ router.post(
  *       - bearerAuth: []
  */
 router.put(
-  '/:id',
+  `/${OBJECT_ID}`,
   authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.EDITOR),
   updateEventRules,
   validate,
@@ -120,8 +121,8 @@ router.put(
  *       - bearerAuth: []
  */
 router.delete(
-  '/:id',
-  authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN),
+  `/${OBJECT_ID}`,
+  authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.EDITOR),
   eventController.deleteEvent,
 );
 
@@ -134,7 +135,7 @@ router.delete(
  *     security:
  *       - bearerAuth: []
  */
-router.post('/:id/register', eventController.registerForEvent);
+router.post(`/${OBJECT_ID}/register`, eventController.registerForEvent);
 
 /**
  * @swagger
@@ -145,7 +146,7 @@ router.post('/:id/register', eventController.registerForEvent);
  *     security:
  *       - bearerAuth: []
  */
-router.delete('/:id/register', eventController.unregisterFromEvent);
+router.delete(`/${OBJECT_ID}/register`, eventController.unregisterFromEvent);
 
 /**
  * @swagger
@@ -157,7 +158,7 @@ router.delete('/:id/register', eventController.unregisterFromEvent);
  *       - bearerAuth: []
  */
 router.patch(
-  '/:id/toggle-publish',
+  `/${OBJECT_ID}/toggle-publish`,
   authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.EDITOR),
   eventController.togglePublish,
 );

@@ -9,6 +9,8 @@
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "seed": "ts-node scripts/seed.ts",
     "healthcheck": "ts-node scripts/healthcheck.ts",
+    "migrate:students": "ts-node scripts/migrateStudentsData.ts",
+    "migrate:students:rollback": "ts-node scripts/migrateStudentsData.ts rollback",
     "lint": "eslint src/ --ext .ts",
     "lint:fix": "eslint src/ --ext .ts --fix",
     "format": "prettier --write \"src/**/*.ts\"",

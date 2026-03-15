@@ -20,6 +20,13 @@ export interface IStudent extends Document {
   enrollmentDate: Date;
   isActive: boolean;
   notes?: string;
+  // Advanced membership system fields
+  status: 'pending' | 'active' | 'suspended' | 'graduated' | 'rejected';
+  reviewedBy?: mongoose.Types.ObjectId;
+  reviewedAt?: Date;
+  reviewNote?: string;
+  membershipType: 'regular' | 'premium' | 'honorary';
+  applicationDate: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -110,6 +117,27 @@ const studentSchema = new Schema<IStudent, IStudentModel>(
       type: String,
       trim: true,
     },
+    // Advanced membership system fields
+    status: {
+      type: String,
+      enum: ['pending', 'active', 'suspended', 'graduated', 'rejected'],
+      default: 'pending',
+    },
+    reviewedBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    reviewedAt: { type: Date },
+    reviewNote: { type: String },
+    membershipType: {
+      type: String,
+      enum: ['regular', 'premium', 'honorary'],
+      default: 'regular',
+    },
+    applicationDate: {
+      type: Date,
+      default: Date.now,
+    },
   },
   {
     timestamps: true,
@@ -120,12 +148,26 @@ const studentSchema = new Schema<IStudent, IStudentModel>(
 
 /* ----------------------------- Indexes ----------------------------- */
 studentSchema.index({ isActive: 1 });
+studentSchema.index({ status: 1 });
+studentSchema.index({ membershipType: 1 });
+studentSchema.index({ applicationDate: -1 });
+studentSchema.index({ studentId: 1 });
 
 /* ----------------------------- Pre-save ----------------------------- */
 studentSchema.pre<IStudent>('save', async function (next) {
   if (!this.studentId) {
-    const count = await mongoose.model('Student').countDocuments();
-    this.studentId = `STU-${String(count + 1).padStart(5, '0')}`;
+    const lastStudent = await mongoose.model('Student')
+      .findOne({}, { studentId: 1 })
+      .sort({ studentId: -1 })
+      .lean() as { studentId?: string } | null;
+
+    let nextNum = 1;
+    if (lastStudent?.studentId) {
+      const match = lastStudent.studentId.match(/STU-(\d+)/);
+      if (match) nextNum = parseInt(match[1], 10) + 1;
+    }
+
+    this.studentId = `STU-${String(nextNum).padStart(5, '0')}`;
   }
   next();
 });

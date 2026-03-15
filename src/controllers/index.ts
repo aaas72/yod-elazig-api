@@ -14,3 +14,6 @@ export * as translationController from './translationController';
 export * as mediaController from './mediaController';
 export * as formController from './formController';
 export * as reportController from './reportController';
+export * as studentAchievementController from './studentAchievementController';
+export * as boardMemberController from './boardMemberController';
+export * as specialLinkController from './specialLinkController';

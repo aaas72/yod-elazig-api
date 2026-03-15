@@ -45,3 +45,12 @@ export type { IFormSubmission } from './FormSubmission';
 
 export { default as Report } from './Report';
 export type { IReport } from './Report';
+
+export { default as StudentAchievement } from './StudentAchievement';
+export type { IStudentAchievement } from './StudentAchievement';
+
+export { default as BoardMember } from './BoardMember';
+export type { IBoardMember } from './BoardMember';
+
+export { default as SpecialLink } from './SpecialLink';
+export type { ISpecialLink } from './SpecialLink';

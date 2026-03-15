@@ -28,15 +28,16 @@ const upload = multer({
 });
 
 const router = Router();
+const OBJECT_ID = ':id([0-9a-fA-F]{24})';
 
 // ── All routes are protected ─────────────────────────
 router.use(verifyToken);
 
 router.get('/', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.EDITOR), mediaController.getAllMedia);
-router.get('/:id', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.EDITOR), mediaController.getMediaById);
+router.get(`/${OBJECT_ID}`, authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.EDITOR), mediaController.getMediaById);
 router.post('/upload', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.EDITOR), upload.single('file'), mediaController.uploadMedia);
 router.post('/upload/multiple', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.EDITOR), upload.array('files', 10), mediaController.uploadMultipleMedia);
-router.patch('/:id', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.EDITOR), mediaController.updateMediaAlt);
-router.delete('/:id', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN), mediaController.deleteMedia);
+router.patch(`/${OBJECT_ID}`, authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.EDITOR), mediaController.updateMediaAlt);
+router.delete(`/${OBJECT_ID}`, authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.EDITOR), mediaController.deleteMedia);
 
 export default router;

@@ -39,6 +39,7 @@ const upload = multer({
 });
 
 const router = Router();
+const OBJECT_ID = ':id([0-9a-fA-F]{24})';
 
 // ── Public routes ────────────────────────────────────
 router.get('/published', reportController.getPublishedReports);
@@ -47,9 +48,9 @@ router.get('/published', reportController.getPublishedReports);
 router.use(verifyToken);
 
 router.get('/', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN), reportController.getAllReports);
-router.get('/:id', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN), reportController.getReportById);
+router.get(`/${OBJECT_ID}`, authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN), reportController.getReportById);
 router.post('/', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN), upload.single('file'), createReportRules, validate, reportController.createReport);
-router.put('/:id', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN), upload.single('file'), updateReportRules, validate, reportController.updateReport);
-router.delete('/:id', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN), reportController.deleteReport);
+router.put(`/${OBJECT_ID}`, authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN), upload.single('file'), updateReportRules, validate, reportController.updateReport);
+router.delete(`/${OBJECT_ID}`, authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN), reportController.deleteReport);
 
 export default router;

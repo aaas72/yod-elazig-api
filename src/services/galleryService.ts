@@ -9,6 +9,7 @@ interface PaginationOptions {
   limit?: number;
   sort?: string;
   category?: string;
+  type?: string;
   isPublished?: boolean;
 }
 
@@ -24,9 +25,10 @@ class GalleryService {
   }
 
   async getAllAlbums(options: PaginationOptions): Promise<PaginatedResult<IAlbum>> {
-    const { page = 1, limit = 10, sort = 'order', category, isPublished } = options;
+    const { page = 1, limit = 10, sort = 'order', category, type, isPublished } = options;
     const filter: FilterQuery<IAlbum> = {};
     if (category) filter.category = category;
+    if (type) filter.type = type;
     if (isPublished !== undefined) filter.isPublished = isPublished;
 
     const limitNum = limit ? Number(limit) : 10;
@@ -74,7 +76,7 @@ class GalleryService {
   }
 
   async getPublishedAlbums(category?: string): Promise<IAlbum[]> {
-    const filter: FilterQuery<IAlbum> = { isPublished: true };
+    const filter: FilterQuery<IAlbum> = { isPublished: true, type: 'public' };
     if (category) filter.category = category;
     const data = await Album.find(filter).sort('order');
     const toRelative = (url?: string) => {

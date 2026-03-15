@@ -18,6 +18,6 @@ export const submitVolunteerRules: ValidationChain[] = [
 
 export const reviewVolunteerRules: ValidationChain[] = [
   body('status').notEmpty().withMessage('Status is required')
-    .isIn(['accepted', 'rejected']).withMessage('Status must be accepted or rejected'),
+    .isIn(['accepted', 'rejected', 'active', 'completed', 'suspended']).withMessage('Invalid status'),
   body('reviewNote').optional().trim(),
 ];

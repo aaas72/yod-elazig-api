@@ -1,4 +1,5 @@
-import { User, Student, News, Event, Program, Volunteer, Album, Achievement, FAQ } from '../models';
+import { User, Student, News, Event, Program, Volunteer, Album, Achievement, FAQ, StudentAchievement, BoardMember } from '../models';
+import Report from '../models/Report';
 import { ROLES } from '../constants';
 
 interface DashboardStats {
@@ -45,12 +46,26 @@ interface DashboardStats {
     rejected: number;
   };
   gallery: {
-    totalAlbums: number;
-    totalPhotos: number;
+    albums: number;
+    photos: number;
   };
   content: {
     achievements: number;
     faqs: number;
+    faqsPublished: number;
+    faqCategories: number;
+  };
+  studentAchievements: {
+    total: number;
+    published: number;
+  };
+  boardMembers: {
+    total: number;
+    executive: number;
+    organizational: number;
+  };
+  reports: {
+    total: number;
   };
 }
 
@@ -60,7 +75,7 @@ class DashboardService {
    */
   async getStats(): Promise<DashboardStats> {
     // ensure programs.byStatus included in type
-    const [users, students, news, events, programs, volunteers, gallery, content] =
+    const [users, students, news, events, programs, volunteers, gallery, content, studentAchievements, boardMembers, reports] =
       await Promise.all([
         this.getUserStats(),
         this.getStudentStats(),
@@ -70,9 +85,12 @@ class DashboardService {
         this.getVolunteerStats(),
         this.getGalleryStats(),
         this.getContentStats(),
+        this.getStudentAchievementStats(),
+        this.getBoardMemberStats(),
+        this.getReportStats(),
       ]);
 
-    return { users, students, news, events, programs, volunteers, gallery, content };
+    return { users, students, news, events, programs, volunteers, gallery, content, studentAchievements, boardMembers, reports };
   }
 
   private async getUserStats(): Promise<DashboardStats['users']> {
@@ -197,18 +215,47 @@ class DashboardService {
     ]);
 
     return {
-      totalAlbums,
-      totalPhotos: photosResult[0]?.totalPhotos || 0,
+      albums: totalAlbums,
+      photos: photosResult[0]?.totalPhotos || 0,
     };
   }
 
   private async getContentStats(): Promise<DashboardStats['content']> {
-    const [achievements, faqs] = await Promise.all([
+    const [achievements, faqs, faqsPublished, categoriesResult] = await Promise.all([
       Achievement.countDocuments(),
       FAQ.countDocuments(),
+      FAQ.countDocuments({ isPublished: true }),
+      FAQ.distinct('category'),
     ]);
 
-    return { achievements, faqs };
+    return {
+      achievements,
+      faqs,
+      faqsPublished,
+      faqCategories: categoriesResult.length,
+    };
+  }
+
+  private async getStudentAchievementStats(): Promise<DashboardStats['studentAchievements']> {
+    const [total, published] = await Promise.all([
+      StudentAchievement.countDocuments(),
+      StudentAchievement.countDocuments({ isPublished: true }),
+    ]);
+    return { total, published };
+  }
+
+  private async getBoardMemberStats(): Promise<DashboardStats['boardMembers']> {
+    const [total, executive, organizational] = await Promise.all([
+      BoardMember.countDocuments(),
+      BoardMember.countDocuments({ type: 'executive' }),
+      BoardMember.countDocuments({ type: 'organizational' }),
+    ]);
+    return { total, executive, organizational };
+  }
+
+  private async getReportStats(): Promise<DashboardStats['reports']> {
+    const total = await Report.countDocuments();
+    return { total };
   }
 }
 

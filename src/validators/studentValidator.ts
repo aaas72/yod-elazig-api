@@ -48,15 +48,22 @@ export const createStudentRules: ValidationChain[] = [
 
 /** Update a student */
 export const updateStudentRules: ValidationChain[] = [
-  body('name')
+  body('fullName')
     .optional()
     .trim()
-    .isLength({ min: 2, max: 100 }).withMessage('Name must be 2-100 characters'),
+    .isLength({ min: 2, max: 100 }).withMessage('Full name must be 2-100 characters'),
+  body('fullNameEn')
+    .optional()
+    .trim()
+    .isLength({ min: 2, max: 100 }).withMessage('Full name (English) must be 2-100 characters'),
   body('email')
     .optional()
     .trim()
     .isEmail().withMessage('Please provide a valid email')
     .normalizeEmail(),
+  body('phoneNumber')
+    .optional()
+    .trim(),
   body('university')
     .optional()
     .trim()
@@ -68,16 +75,22 @@ export const updateStudentRules: ValidationChain[] = [
   body('yearOfStudy')
     .optional()
     .isInt({ min: 1, max: 8 }).withMessage('Year of study must be between 1 and 8'),
-  body('phone')
-    .optional()
-    .trim(),
-  body('nationality')
-    .optional()
-    .trim(),
   body('address')
     .optional()
     .trim(),
   body('notes')
     .optional()
     .trim(),
+];
+
+/** Review a student membership application */
+export const reviewStudentRules: ValidationChain[] = [
+  body('status')
+    .notEmpty().withMessage('Status is required')
+    .isIn(['rejected', 'active', 'suspended', 'graduated'])
+    .withMessage('Status must be one of: rejected, active, suspended, graduated'),
+  body('reviewNote')
+    .optional()
+    .trim()
+    .isLength({ max: 1000 }).withMessage('Review note cannot exceed 1000 characters'),
 ];

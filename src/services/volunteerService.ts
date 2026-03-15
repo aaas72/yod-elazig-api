@@ -33,6 +33,7 @@ class VolunteerService {
         { name: new RegExp(search, 'i') },
         { email: new RegExp(search, 'i') },
         { university: new RegExp(search, 'i') },
+        { volunteerId: new RegExp(search, 'i') },
       ];
     }
 
@@ -52,9 +53,15 @@ class VolunteerService {
     return item;
   }
 
+  async getByVolunteerId(volunteerId: string): Promise<IVolunteer> {
+    const item = await Volunteer.findOne({ volunteerId }).populate('reviewedBy', 'name email');
+    if (!item) throw new ApiError(HTTP_STATUS.NOT_FOUND, 'Volunteer application not found');
+    return item;
+  }
+
   async review(
     id: string,
-    status: 'accepted' | 'rejected',
+    status: 'accepted' | 'rejected' | 'active' | 'completed' | 'suspended',
     userId: string,
     reviewNote?: string,
   ): Promise<IVolunteer> {
@@ -68,19 +75,29 @@ class VolunteerService {
     return item.populate('reviewedBy', 'name email');
   }
 
+  async update(id: string, data: Partial<IVolunteer>): Promise<IVolunteer> {
+    const item = await Volunteer.findByIdAndUpdate(id, data, { new: true, runValidators: true })
+      .populate('reviewedBy', 'name email');
+    if (!item) throw new ApiError(HTTP_STATUS.NOT_FOUND, 'Volunteer application not found');
+    return item;
+  }
+
   async delete(id: string): Promise<void> {
     const item = await Volunteer.findByIdAndDelete(id);
     if (!item) throw new ApiError(HTTP_STATUS.NOT_FOUND, 'Volunteer application not found');
   }
 
-  async getStats(): Promise<{ total: number; pending: number; accepted: number; rejected: number }> {
-    const [total, pending, accepted, rejected] = await Promise.all([
+  async getStats() {
+    const [total, pending, accepted, rejected, active, completed, suspended] = await Promise.all([
       Volunteer.countDocuments(),
       Volunteer.countDocuments({ status: 'pending' }),
       Volunteer.countDocuments({ status: 'accepted' }),
       Volunteer.countDocuments({ status: 'rejected' }),
+      Volunteer.countDocuments({ status: 'active' }),
+      Volunteer.countDocuments({ status: 'completed' }),
+      Volunteer.countDocuments({ status: 'suspended' }),
     ]);
-    return { total, pending, accepted, rejected };
+    return { total, pending, accepted, rejected, active, completed, suspended };
   }
 
   async export(status?: string): Promise<IVolunteer[]> {

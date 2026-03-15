@@ -18,6 +18,11 @@ export const getVolunteerById = asyncHandler(async (req: Request, res: Response)
   new ApiResponse(HTTP_STATUS.OK, 'Volunteer retrieved', { volunteer }).send(res);
 });
 
+export const getVolunteerByVolunteerId = asyncHandler(async (req: Request, res: Response) => {
+  const volunteer = await volunteerService.getByVolunteerId(req.params.volunteerId as string);
+  new ApiResponse(HTTP_STATUS.OK, 'Volunteer retrieved', { volunteer }).send(res);
+});
+
 export const reviewVolunteer = asyncHandler(async (req: Request, res: Response) => {
   const { status, reviewNote } = req.body;
   const volunteer = await volunteerService.review(
@@ -27,6 +32,11 @@ export const reviewVolunteer = asyncHandler(async (req: Request, res: Response) 
     reviewNote,
   );
   new ApiResponse(HTTP_STATUS.OK, 'Volunteer reviewed', { volunteer }).send(res);
+});
+
+export const updateVolunteer = asyncHandler(async (req: Request, res: Response) => {
+  const volunteer = await volunteerService.update(req.params.id as string, req.body);
+  new ApiResponse(HTTP_STATUS.OK, 'Volunteer updated successfully', { volunteer }).send(res);
 });
 
 export const deleteVolunteer = asyncHandler(async (req: Request, res: Response) => {

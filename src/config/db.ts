@@ -11,7 +11,7 @@ const connectDB = async (): Promise<typeof mongoose> => {
 
   while (retries < MAX_RETRIES) {
     try {
-      const conn = await mongoose.connect(process.env.MONGO_URI as string, {
+      const conn = await mongoose.connect(process.env.MONGODB_URI || process.env.MONGO_URI as string, {
         autoIndex: process.env.NODE_ENV !== 'production',
       });
       logger.info(`MongoDB connected: ${conn.connection.host}`);

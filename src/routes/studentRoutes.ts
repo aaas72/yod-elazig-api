@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { studentController } from '../controllers';
 import { verifyToken, authorizeRoles, validate } from '../middlewares';
-import { createStudentRules, updateStudentRules } from '../validators';
+import { createStudentRules, updateStudentRules, reviewStudentRules } from '../validators';
 import { ROLES } from '../constants';
 import multer from 'multer';
 import fs from 'fs';
@@ -37,6 +37,9 @@ const upload = multer({
 });
 
 const router = Router();
+
+// Regex constraint: only match valid MongoDB ObjectId (24 hex chars)
+const OBJECT_ID = ':id([0-9a-fA-F]{24})';
 
 /**
  * @swagger
@@ -78,6 +81,51 @@ router.get(
 
 /**
  * @swagger
+ * /api/v1/students/stats:
+ *   get:
+ *     summary: Get students statistics
+ *     tags: [Students]
+ *     security:
+ *       - bearerAuth: []
+ */
+router.get(
+  '/stats',
+  authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.EDITOR),
+  studentController.getStudentStats,
+);
+
+/**
+ * @swagger
+ * /api/v1/students/export:
+ *   get:
+ *     summary: Export students data
+ *     tags: [Students]
+ *     security:
+ *       - bearerAuth: []
+ */
+router.get(
+  '/export',
+  authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN),
+  studentController.exportStudents,
+);
+
+/**
+ * @swagger
+ * /api/v1/students/by-id/{studentId}:
+ *   get:
+ *     summary: Get student by studentId
+ *     tags: [Students]
+ *     security:
+ *       - bearerAuth: []
+ */
+router.get(
+  '/by-id/:studentId',
+  authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.EDITOR),
+  studentController.getStudentByStudentId,
+);
+
+/**
+ * @swagger
  * /api/v1/students/{id}:
  *   get:
  *     summary: Get student by ID
@@ -86,7 +134,7 @@ router.get(
  *       - bearerAuth: []
  */
 router.get(
-  '/:id',
+  `/${OBJECT_ID}`,
   authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.EDITOR),
   studentController.getStudent,
 );
@@ -122,11 +170,28 @@ router.post(
  *       - bearerAuth: []
  */
 router.put(
-  '/:id',
+  `/${OBJECT_ID}`,
   authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN),
   updateStudentRules,
   validate,
   studentController.updateStudent,
+);
+
+/**
+ * @swagger
+ * /api/v1/students/{id}/review:
+ *   patch:
+ *     summary: Review student membership application
+ *     tags: [Students]
+ *     security:
+ *       - bearerAuth: []
+ */
+router.patch(
+  `/${OBJECT_ID}/review`,
+  authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN),
+  reviewStudentRules,
+  validate,
+  studentController.reviewStudent,
 );
 
 /**
@@ -139,7 +204,7 @@ router.put(
  *       - bearerAuth: []
  */
 router.delete(
-  '/:id',
+  `/${OBJECT_ID}`,
   authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN),
   studentController.deleteStudent,
 );

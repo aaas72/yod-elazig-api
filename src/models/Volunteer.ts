@@ -2,6 +2,7 @@ import mongoose, { Document, Model, Schema } from 'mongoose';
 
 /* ----------------------------- Interface ----------------------------- */
 export interface IVolunteer extends Document {
+  volunteerId: string;
   name: string;
   email: string;
   phone: string;
@@ -11,7 +12,7 @@ export interface IVolunteer extends Document {
   skills: string[];
   motivation: string;
   availableHours?: number;
-  status: 'pending' | 'accepted' | 'rejected';
+  status: 'pending' | 'accepted' | 'rejected' | 'active' | 'completed' | 'suspended';
   reviewedBy?: mongoose.Types.ObjectId;
   reviewedAt?: Date;
   reviewNote?: string;
@@ -24,6 +25,10 @@ interface IVolunteerModel extends Model<IVolunteer> {}
 /* ----------------------------- Schema ----------------------------- */
 const volunteerSchema = new Schema<IVolunteer, IVolunteerModel>(
   {
+    volunteerId: {
+      type: String,
+      trim: true,
+    },
     name: {
       type: String,
       required: [true, 'Name is required'],
@@ -54,7 +59,7 @@ const volunteerSchema = new Schema<IVolunteer, IVolunteerModel>(
     availableHours: { type: Number, min: 0 },
     status: {
       type: String,
-      enum: ['pending', 'accepted', 'rejected'],
+      enum: ['pending', 'accepted', 'rejected', 'active', 'completed', 'suspended'],
       default: 'pending',
     },
     reviewedBy: {
@@ -72,9 +77,19 @@ const volunteerSchema = new Schema<IVolunteer, IVolunteerModel>(
 );
 
 /* ----------------------------- Indexes ----------------------------- */
+volunteerSchema.index({ volunteerId: 1 });
 volunteerSchema.index({ status: 1 });
 volunteerSchema.index({ email: 1 });
 volunteerSchema.index({ createdAt: -1 });
+
+/* ----------------------------- Pre-save ----------------------------- */
+volunteerSchema.pre<IVolunteer>('save', async function (next) {
+  if (!this.volunteerId) {
+    const count = await mongoose.model('Volunteer').countDocuments();
+    this.volunteerId = `VOL-${String(count + 1).padStart(5, '0')}`;
+  }
+  next();
+});
 
 const Volunteer = mongoose.model<IVolunteer, IVolunteerModel>('Volunteer', volunteerSchema);
 

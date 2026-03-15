@@ -149,3 +149,54 @@ export const deleteStudent = asyncHandler(async (req: Request, res: Response) =>
   await studentService.delete(req.params.id as string);
   new ApiResponse(HTTP_STATUS.OK, 'Student deleted successfully').send(res);
 });
+
+/**
+ * @desc    Get students statistics
+ * @route   GET /api/v1/students/stats
+ * @access  Private (admin, editor)
+ */
+export const getStudentStats = asyncHandler(async (_req: Request, res: Response) => {
+  try {
+    const stats = await studentService.getStats();
+    new ApiResponse(HTTP_STATUS.OK, 'Student stats retrieved', { stats }).send(res);
+  } catch (error) {
+    console.error('Error in getStudentStats:', error);
+    throw error;
+  }
+});
+
+/**
+ * @desc    Review student membership application
+ * @route   PATCH /api/v1/students/:id/review
+ * @access  Private (admin)
+ */
+export const reviewStudent = asyncHandler(async (req: Request, res: Response) => {
+  const { status, reviewNote } = req.body;
+  const student = await studentService.review(
+    req.params.id as string,
+    status,
+    req.user!._id.toString(),
+    reviewNote,
+  );
+  new ApiResponse(HTTP_STATUS.OK, 'Student reviewed', { student }).send(res);
+});
+
+/**
+ * @desc    Get student by studentId
+ * @route   GET /api/v1/students/by-id/:studentId
+ * @access  Private (admin, editor)
+ */
+export const getStudentByStudentId = asyncHandler(async (req: Request, res: Response) => {
+  const student = await studentService.getByStudentId(req.params.studentId as string);
+  new ApiResponse(HTTP_STATUS.OK, 'Student retrieved', { student }).send(res);
+});
+
+/**
+ * @desc    Export students data
+ * @route   GET /api/v1/students/export
+ * @access  Private (admin)
+ */
+export const exportStudents = asyncHandler(async (req: Request, res: Response) => {
+  const students = await studentService.export(req.query as any);
+  new ApiResponse(HTTP_STATUS.OK, 'Students exported', { students }).send(res);
+});

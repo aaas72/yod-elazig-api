@@ -17,6 +17,7 @@ export interface IAlbum extends Document {
   coverImage?: string;
   photos: IPhoto[];
   category?: string;
+  type: 'public' | 'private';
   order: number;
   isPublished: boolean;
   createdAt: Date;
@@ -73,6 +74,7 @@ const albumSchema = new Schema<IAlbum, IAlbumModel>(
     coverImage: { type: String },
     photos: [photoSchema],
     category: { type: String, trim: true },
+    type: { type: String, enum: ['public', 'private'], default: 'public' },
     order: { type: Number, default: 0 },
     isPublished: { type: Boolean, default: true },
   },
@@ -85,6 +87,7 @@ const albumSchema = new Schema<IAlbum, IAlbumModel>(
 
 /* ----------------------------- Indexes ----------------------------- */
 albumSchema.index({ category: 1 });
+albumSchema.index({ type: 1 });
 albumSchema.index({ order: 1 });
 albumSchema.index({ isPublished: 1 });
 

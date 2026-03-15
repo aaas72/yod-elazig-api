@@ -5,6 +5,7 @@ import { verifyToken, authorizeRoles } from '../middlewares';
 import { ROLES } from '../constants';
 
 const router = Router();
+const OBJECT_ID = ':id([0-9a-fA-F]{24})';
 const upload = multer({
     storage: multer.memoryStorage(),
     limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB
@@ -19,7 +20,6 @@ const handleUpload = (req: any, res: any, next: any) => {
     const uploadMiddleware = upload.any();
     uploadMiddleware(req, res, (err) => {
         if (err) {
-            // Handle Multer errors (e.g., file type, size limit)
             return res.status(422).json({
                 success: false,
                 message: err.message || 'File upload error',
@@ -30,7 +30,7 @@ const handleUpload = (req: any, res: any, next: any) => {
         // Ensure body is populated even if empty
         if (!req.body) req.body = {};
 
-        next();
+        return next();
     });
 };
 
@@ -43,11 +43,11 @@ router.use(verifyToken);
 router.use(authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.EDITOR));
 
 router.get('/', formController.getAllForms);
-router.get('/:id', formController.getFormById);
+router.get(`/${OBJECT_ID}`, formController.getFormById);
 router.post('/', formController.createForm);
-router.put('/:id', formController.updateForm);
-router.delete('/:id', formController.deleteForm);
+router.put(`/${OBJECT_ID}`, formController.updateForm);
+router.delete(`/${OBJECT_ID}`, formController.deleteForm);
 
-router.get('/:formId/submissions', formController.getFormSubmissions);
+router.get(`/:formId([0-9a-fA-F]{24})/submissions`, formController.getFormSubmissions);
 
 export default router;

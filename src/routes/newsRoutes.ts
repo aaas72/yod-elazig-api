@@ -5,6 +5,7 @@ import { createNewsRules, updateNewsRules } from '../validators';
 import { ROLES } from '../constants';
 
 const router = Router();
+const OBJECT_ID = ':id([0-9a-fA-F]{24})';
 
 /**
  * @swagger
@@ -62,7 +63,7 @@ router.get(
  *       - bearerAuth: []
  */
 router.get(
-  '/:id',
+  `/${OBJECT_ID}`,
   authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.EDITOR),
   newsController.getNewsById,
 );
@@ -94,7 +95,7 @@ router.post(
  *       - bearerAuth: []
  */
 router.put(
-  '/:id',
+  `/${OBJECT_ID}`,
   authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.EDITOR),
   updateNewsRules,
   validate,
@@ -111,8 +112,8 @@ router.put(
  *       - bearerAuth: []
  */
 router.delete(
-  '/:id',
-  authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN),
+  `/${OBJECT_ID}`,
+  authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.EDITOR),
   newsController.deleteNews,
 );
 
@@ -126,7 +127,7 @@ router.delete(
  *       - bearerAuth: []
  */
 router.patch(
-  '/:id/toggle-publish',
+  `/${OBJECT_ID}/toggle-publish`,
   authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.EDITOR),
   newsController.togglePublish,
 );

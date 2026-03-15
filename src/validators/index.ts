@@ -10,6 +10,7 @@ export {
 export {
   createStudentRules,
   updateStudentRules,
+  reviewStudentRules,
 } from './studentValidator';
 
 export {
@@ -30,3 +31,6 @@ export { createAlbumRules, updateAlbumRules, addPhotosRules } from './galleryVal
 export { createTickerRules, updateTickerRules } from './tickerValidator';
 export { createReportRules, updateReportRules } from './reportValidator';
 export { upsertTranslationRules, bulkTranslationRules } from './translationValidator';
+export { createStudentAchievementRules, updateStudentAchievementRules } from './studentAchievementValidator';
+export { createBoardMemberRules, updateBoardMemberRules } from './boardMemberValidator';
+export { createSpecialLinkRules, updateSpecialLinkRules } from './specialLinkValidator';

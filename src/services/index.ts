@@ -14,3 +14,6 @@ export { default as tickerService } from './tickerService';
 export { default as translationService } from './translationService';
 export { default as mediaService } from './mediaService';
 export { default as reportService } from './reportService';
+export { default as studentAchievementService } from './studentAchievementService';
+export { default as boardMemberService } from './boardMemberService';
+export { default as specialLinkService } from './specialLinkService';
