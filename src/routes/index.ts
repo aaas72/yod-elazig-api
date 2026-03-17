@@ -1,0 +1,48 @@
+import { Router } from 'express';
+import authRoutes from './authRoutes';
+import studentRoutes from './studentRoutes';
+import newsRoutes from './newsRoutes';
+import eventRoutes from './eventRoutes';
+import dashboardRoutes from './dashboardRoutes';
+import programRoutes from './programRoutes';
+import achievementRoutes from './achievementRoutes';
+import faqRoutes from './faqRoutes';
+import settingRoutes from './settingRoutes';
+import userRoutes from './userRoutes';
+import volunteerRoutes from './volunteerRoutes';
+import galleryRoutes from './galleryRoutes';
+import tickerRoutes from './tickerRoutes';
+import translationRoutes from './translationRoutes';
+import mediaRoutes from './mediaRoutes';
+import uploadRoutes from './uploadRoutes';
+import formRoutes from './formRoutes';
+import reportRoutes from './reportRoutes';
+import studentAchievementRoutes from './studentAchievementRoutes';
+import boardMemberRoutes from './boardMemberRoutes';
+import specialLinkRoutes from './specialLinkRoutes';
+
+const router = Router();
+
+router.use('/auth', authRoutes);
+router.use('/students', studentRoutes);
+router.use('/news', newsRoutes);
+router.use('/events', eventRoutes);
+router.use('/dashboard', dashboardRoutes);
+router.use('/programs', programRoutes);
+router.use('/achievements', achievementRoutes);
+router.use('/faq', faqRoutes);
+router.use('/settings', settingRoutes);
+router.use('/users', userRoutes);
+router.use('/volunteers', volunteerRoutes);
+router.use('/gallery', galleryRoutes);
+router.use('/ticker', tickerRoutes);
+router.use('/translations', translationRoutes);
+router.use('/media', mediaRoutes);
+router.use('/upload', uploadRoutes);
+router.use('/forms', formRoutes);
+router.use('/reports', reportRoutes);
+router.use('/student-achievements', studentAchievementRoutes);
+router.use('/board-members', boardMemberRoutes);
+router.use('/special-links', specialLinkRoutes);
+
+export default router;
