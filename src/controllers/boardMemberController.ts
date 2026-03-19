@@ -14,7 +14,7 @@ export const getAllBoardMembers = asyncHandler(async (req: Request, res: Respons
 });
 
 export const getPublishedBoardMembers = asyncHandler(async (req: Request, res: Response) => {
-  const type = req.query.type as 'executive' | 'organizational' | undefined;
+  const type = req.query.type as 'executive' | 'organizational' | 'supervisory' | undefined;
   const members = await boardMemberService.getPublished(type);
   new ApiResponse(HTTP_STATUS.OK, 'Board members retrieved', { members }).send(res);
 });

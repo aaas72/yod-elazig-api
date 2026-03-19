@@ -14,7 +14,7 @@ export const createBoardMemberRules: ValidationChain[] = [
   body('socialLinks.facebook').optional().trim(),
   body('socialLinks.instagram').optional().trim(),
   body('socialLinks.linkedin').optional().trim(),
-  body('type').notEmpty().isIn(['executive', 'organizational']).withMessage('Type must be executive or organizational'),
+  body('type').notEmpty().isIn(['executive', 'organizational', 'supervisory']).withMessage('Type must be executive, organizational, or supervisory'),
   body('order').optional().isInt({ min: 0 }).withMessage('Order must be a positive integer'),
   body('isPublished').optional().isBoolean(),
 ];
@@ -33,7 +33,7 @@ export const updateBoardMemberRules: ValidationChain[] = [
   body('socialLinks.facebook').optional().trim(),
   body('socialLinks.instagram').optional().trim(),
   body('socialLinks.linkedin').optional().trim(),
-  body('type').optional().isIn(['executive', 'organizational']),
+  body('type').optional().isIn(['executive', 'organizational', 'supervisory']),
   body('order').optional().isInt({ min: 0 }),
   body('isPublished').optional().isBoolean(),
 ];

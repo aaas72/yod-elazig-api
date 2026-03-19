@@ -10,7 +10,7 @@ interface PaginationOptions {
   sort?: string;
   search?: string;
   isPublished?: boolean;
-  type?: 'executive' | 'organizational';
+  type?: 'executive' | 'organizational' | 'supervisory';
 }
 
 interface PaginatedResult<T> {
@@ -44,7 +44,7 @@ class BoardMemberService {
     return { data, pagination: { total, page, limit, pages: Math.ceil(total / limit) } };
   }
 
-  async getPublished(type?: 'executive' | 'organizational'): Promise<IBoardMember[]> {
+  async getPublished(type?: 'executive' | 'organizational' | 'supervisory'): Promise<IBoardMember[]> {
     const filter: FilterQuery<IBoardMember> = { isPublished: true };
     if (type) filter.type = type;
     return BoardMember.find(filter).sort('order');

@@ -7,6 +7,7 @@ export { default as dashboardService } from './dashboardService';
 export { default as programService } from './programService';
 export { default as achievementService } from './achievementService';
 export { default as faqService } from './faqService';
+export { default as faqCategoryService } from './faqCategoryService';
 export { default as settingService } from './settingService';
 export { default as volunteerService } from './volunteerService';
 export { default as galleryService } from './galleryService';
@@ -17,3 +18,4 @@ export { default as reportService } from './reportService';
 export { default as studentAchievementService } from './studentAchievementService';
 export { default as boardMemberService } from './boardMemberService';
 export { default as specialLinkService } from './specialLinkService';
+

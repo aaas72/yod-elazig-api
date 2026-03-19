@@ -23,7 +23,7 @@ export interface IBoardMember extends Document {
     instagram?: string;
     linkedin?: string;
   };
-  type: 'executive' | 'organizational';
+  type: 'executive' | 'organizational' | 'supervisory';
   order: number;
   isPublished: boolean;
   createdAt: Date;
@@ -56,7 +56,7 @@ const boardMemberSchema = new Schema<IBoardMember, IBoardMemberModel>(
       instagram: { type: String, trim: true, default: '' },
       linkedin: { type: String, trim: true, default: '' },
     },
-    type: { type: String, enum: ['executive', 'organizational'], required: [true, 'Type is required'] },
+    type: { type: String, enum: ['executive', 'organizational', 'supervisory'], required: [true, 'Type is required'] },
     order: { type: Number, default: 0 },
     isPublished: { type: Boolean, default: false },
   },

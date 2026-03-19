@@ -22,6 +22,9 @@ export type { IAchievement } from './Achievement';
 export { default as FAQ } from './FAQ';
 export type { IFAQ } from './FAQ';
 
+export { default as FaqCategory } from './FaqCategory';
+export type { IFaqCategory } from './FaqCategory';
+
 export { default as Setting } from './Setting';
 export type { ISetting } from './Setting';
 
