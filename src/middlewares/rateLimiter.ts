@@ -17,6 +17,8 @@ export const apiLimiter = rateLimit({
     message: 'Too many requests from this IP, please try again later.',
   },
   statusCode: HTTP_STATUS.TOO_MANY_REQUESTS,
+  // Skip validation for X-Forwarded-For (trust proxy is set in app.ts)
+  validate: { xForwardedForHeader: false },
 });
 
 /**
@@ -32,4 +34,6 @@ export const authLimiter = rateLimit({
     message: 'Too many authentication attempts, please try again later.',
   },
   statusCode: HTTP_STATUS.TOO_MANY_REQUESTS,
+  // Skip validation for X-Forwarded-For (trust proxy is set in app.ts)
+  validate: { xForwardedForHeader: false },
 });
