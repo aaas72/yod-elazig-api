@@ -16,6 +16,9 @@ import { logger } from './utils';
 
 const app: Application = express();
 
+// ── Trust proxy (behind Nginx/reverse proxy) ─────────
+app.set('trust proxy', 1);
+
 // ── Compression (gzip/brotli) ────────────────────────
 app.use(compression());
 
