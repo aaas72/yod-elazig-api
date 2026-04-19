@@ -11,6 +11,12 @@ export const registerRules: ValidationChain[] = [
     .notEmpty().withMessage('Email is required')
     .isEmail().withMessage('Please provide a valid email')
     .normalizeEmail(),
+  body('username')
+    .optional()
+    .trim()
+    .matches(/^[a-zA-Z0-9._-]+$/).withMessage('Username can only contain letters, numbers, dot, dash, or underscore')
+    .isLength({ min: 4, max: 30 }).withMessage('Username must be 4-30 characters')
+    .toLowerCase(),
   body('password')
     .notEmpty().withMessage('Password is required')
     .isLength({ min: 8 }).withMessage('Password must be at least 8 characters')
@@ -20,11 +26,24 @@ export const registerRules: ValidationChain[] = [
 
 /** Login */
 export const loginRules: ValidationChain[] = [
-  body('email')
+  body('username')
+    .optional()
     .trim()
-    .notEmpty().withMessage('Email is required')
+    .notEmpty().withMessage('Username is required')
+    .isLength({ min: 2, max: 50 }).withMessage('Username must be 2-50 characters')
+    .toLowerCase(),
+  body('email')
+    .optional()
+    .trim()
     .isEmail().withMessage('Please provide a valid email')
     .normalizeEmail(),
+  body()
+    .custom((value) => {
+      if (!value?.username && !value?.email) {
+        throw new Error('Username is required');
+      }
+      return true;
+    }),
   body('password')
     .notEmpty().withMessage('Password is required'),
 ];

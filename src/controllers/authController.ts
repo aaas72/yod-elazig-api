@@ -23,8 +23,9 @@ export const register = asyncHandler(async (req: Request, res: Response) => {
  * @access  Public
  */
 export const login = asyncHandler(async (req: Request, res: Response) => {
-  const { email, password } = req.body;
-  const { user, accessToken, refreshToken } = await authService.login(email, password);
+  const identity = (req.body.username || req.body.email) as string;
+  const { password } = req.body;
+  const { user, accessToken, refreshToken } = await authService.login(identity, password);
   new ApiResponse(HTTP_STATUS.OK, 'Login successful', {
     user,
     accessToken,

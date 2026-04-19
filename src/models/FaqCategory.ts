@@ -30,6 +30,7 @@ const faqCategorySchema = new Schema<IFaqCategory, IFaqCategoryModel>(
       unique: true,
       trim: true,
       lowercase: true,
+      index: true,
     },
     order: { type: Number, default: 0 },
     isActive: { type: Boolean, default: true },
@@ -43,7 +44,7 @@ const faqCategorySchema = new Schema<IFaqCategory, IFaqCategoryModel>(
 
 /* ----------------------------- Indexes ----------------------------- */
 faqCategorySchema.index({ order: 1 });
-faqCategorySchema.index({ slug: 1 });
+
 faqCategorySchema.index({ isActive: 1 });
 
 const FaqCategory = mongoose.model<IFaqCategory, IFaqCategoryModel>('FaqCategory', faqCategorySchema);

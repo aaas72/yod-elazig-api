@@ -3,10 +3,45 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { ROLES, ROLE_VALUES, Role } from '../constants/roles';
 
+const ROLE_USERNAME_PREFIX: Record<Role, string> = {
+  [ROLES.SUPER_ADMIN]: 'sa',
+  [ROLES.ADMIN]: 'ad',
+  [ROLES.EDITOR]: 'ed',
+  [ROLES.STUDENT]: 'st',
+};
+
+const buildUsername = (prefix: string, sequence: number): string => {
+  return `${prefix}${String(sequence).padStart(4, '0')}`;
+};
+
+const generateRoleUsername = async (
+  role: Role,
+  excludeUserId?: mongoose.Types.ObjectId,
+): Promise<string> => {
+  const prefix = ROLE_USERNAME_PREFIX[role] || 'us';
+  const UserModel = mongoose.model<IUser>('User');
+
+  let sequence = (await UserModel.countDocuments({ role })) + 1;
+  let candidate = buildUsername(prefix, sequence);
+
+  while (
+    await UserModel.exists({
+      username: candidate,
+      ...(excludeUserId ? { _id: { $ne: excludeUserId } } : {}),
+    })
+  ) {
+    sequence += 1;
+    candidate = buildUsername(prefix, sequence);
+  }
+
+  return candidate;
+};
+
 /* ----------------------------- Interface ----------------------------- */
 export interface IUser extends Document {
   _id: mongoose.Types.ObjectId;
   name: string;
+  username: string;
   email: string;
   password: string;
   role: Role;
@@ -33,6 +68,15 @@ const userSchema = new Schema<IUser, IUserModel>(
       trim: true,
       minlength: [2, 'Name must be at least 2 characters'],
       maxlength: [100, 'Name cannot exceed 100 characters'],
+    },
+    username: {
+      type: String,
+      required: [true, 'Username is required'],
+      unique: true,
+      sparse: true,
+      lowercase: true,
+      trim: true,
+      match: [/^[a-z0-9._-]+$/, 'Username can only contain letters, numbers, dot, dash, or underscore'],
     },
     email: {
       type: String,
@@ -70,6 +114,23 @@ const userSchema = new Schema<IUser, IUserModel>(
 
 /* ----------------------------- Indexes ----------------------------- */
 userSchema.index({ role: 1 });
+
+/* ----------------------------- Pre-validate ----------------------------- */
+userSchema.pre<IUser>('validate', async function (next) {
+  if (!this.username || (this.isModified('role') && !this.isModified('username'))) {
+    this.username = await generateRoleUsername(this.role, this._id);
+  }
+
+  if (this.username) {
+    this.username = this.username.trim().toLowerCase();
+  }
+
+  if (this.email) {
+    this.email = this.email.trim().toLowerCase();
+  }
+
+  next();
+});
 
 /* ----------------------------- Pre-save ----------------------------- */
 userSchema.pre<IUser>('save', async function (next) {

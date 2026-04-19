@@ -1,26 +1,21 @@
 import { Request, Response } from 'express';
-import { studentService } from '../services';
+import { studentService, mediaService } from '../services';
 import { ApiResponse, asyncHandler } from '../utils';
 import { HTTP_STATUS } from '../constants';
-import fs from 'fs';
-import path from 'path';
 
-const UPLOAD_DIR = process.env.UPLOAD_DIR || 'uploads';
-
-const getTempPath = (filename: string) => `/${UPLOAD_DIR}/temp/${filename}`;
-const getStudentPath = (folder: string, filename: string) => `/${UPLOAD_DIR}/students/${folder}/${filename}`;
+type UploadedFields = {
+  profileImage?: Express.Multer.File;
+  studentDocument?: Express.Multer.File;
+  allFiles: Express.Multer.File[];
+};
 
 /**
  * Collects all uploaded files from req.files and returns
  * named fields (profileImage, studentDocument) + all temp paths.
  */
-function collectUploadedFiles(req: Request): {
-  profileImage?: string;
-  studentDocument?: string;
-  allFiles: Express.Multer.File[];
-} {
-  let profileImage: string | undefined;
-  let studentDocument: string | undefined;
+function collectUploadedFiles(req: Request): UploadedFields {
+  let profileImage: Express.Multer.File | undefined;
+  let studentDocument: Express.Multer.File | undefined;
   const allFiles: Express.Multer.File[] = [];
 
   if (!req.files) return { profileImage, studentDocument, allFiles };
@@ -30,12 +25,8 @@ function collectUploadedFiles(req: Request): {
   } else {
     const fields = req.files as { [fieldname: string]: Express.Multer.File[] };
 
-    if (fields.profileImage?.[0]) {
-      profileImage = getTempPath(fields.profileImage[0].filename);
-    }
-    if (fields.studentDocument?.[0]) {
-      studentDocument = getTempPath(fields.studentDocument[0].filename);
-    }
+    if (fields.profileImage?.[0]) profileImage = fields.profileImage[0];
+    if (fields.studentDocument?.[0]) studentDocument = fields.studentDocument[0];
 
     Object.values(fields).forEach(arr => allFiles.push(...arr));
   }
@@ -44,66 +35,93 @@ function collectUploadedFiles(req: Request): {
 }
 
 /**
- * Moves a file from the temp directory to the student's folder.
- * Returns the new relative path, or undefined if the move failed.
- */
-function moveFileToStudentDir(
-  file: Express.Multer.File,
-  tempDir: string,
-  targetDir: string,
-  studentFolder: string,
-): string | undefined {
-  const src = path.join(tempDir, file.filename);
-  const dest = path.join(targetDir, file.filename);
-
-  try {
-    if (fs.existsSync(src)) fs.renameSync(src, dest);
-    if (fs.existsSync(dest)) return getStudentPath(studentFolder, file.filename);
-  } catch (_err) {}
-
-  return undefined;
-}
-
-/**
  * @desc    Create a new student
  * @route   POST /api/v1/students/join
  * @access  Public
  */
 export const createStudent = asyncHandler(async (req: Request, res: Response) => {
-  // 1. Collect uploaded files
   const { profileImage, studentDocument, allFiles } = collectUploadedFiles(req);
-  const fileNames = allFiles.map(f => getTempPath(f.filename));
+  const uploadedMediaIds: string[] = [];
+  let student = await studentService.create({ ...req.body });
 
-  // 2. Create student record with temp paths to obtain a generated ID
-  let student = await studentService.create({
-    ...req.body,
-    profileImage,
-    studentDocument,
-    files: fileNames,
-  });
+  try {
+    if (allFiles.length > 0) {
+      const safeFirstName = student.fullName
+        .split(' ')[0]
+        .trim()
+        .replace(/[^a-zA-Z0-9\u0600-\u06FF_-]/g, '');
 
-  // 3. Build student-specific folder: FirstName_StudentID
-  const safeFirstName = student.fullName.split(' ')[0].trim().replace(/[^a-zA-Z0-9\u0600-\u06FF_-]/g, '');
-  const studentFolder = `${safeFirstName}_${student.studentId}`;
-  const tempDir = path.join(UPLOAD_DIR, 'temp');
-  const targetDir = path.join(UPLOAD_DIR, 'students', studentFolder);
+      const studentFolder = `${safeFirstName || 'student'}_${student.studentId}`;
+      const targetFolder = `students/${studentFolder}`;
+      const uploadedUrls: string[] = [];
+      let profileImageUrl: string | undefined;
+      let studentDocumentUrl: string | undefined;
 
-  fs.mkdirSync(targetDir, { recursive: true });
+      if (profileImage) {
+        const profileMedia = await mediaService.upload(
+          profileImage,
+          req.user?._id?.toString(),
+          targetFolder,
+          `Profile image - ${student.fullName}`,
+        );
+        uploadedMediaIds.push(String(profileMedia._id));
+        profileImageUrl = profileMedia.url;
+        uploadedUrls.push(profileMedia.url);
+      }
 
-  // 4. Move all files from temp → student folder; build tempPath → newPath map
-  const fileMap = new Map<string, string>();
-  for (const file of allFiles) {
-    const newPath = moveFileToStudentDir(file, tempDir, targetDir, studentFolder);
-    if (newPath) fileMap.set(getTempPath(file.filename), newPath);
+      if (studentDocument) {
+        const documentMedia = await mediaService.upload(
+          studentDocument,
+          req.user?._id?.toString(),
+          targetFolder,
+          `Student document - ${student.fullName}`,
+        );
+        uploadedMediaIds.push(String(documentMedia._id));
+        studentDocumentUrl = documentMedia.url;
+        uploadedUrls.push(documentMedia.url);
+      }
+
+      const mappedFiles = new Set<string>();
+      if (profileImage) mappedFiles.add(profileImage.originalname + profileImage.size + profileImage.mimetype);
+      if (studentDocument) mappedFiles.add(studentDocument.originalname + studentDocument.size + studentDocument.mimetype);
+
+      for (const file of allFiles) {
+        const fingerprint = file.originalname + file.size + file.mimetype;
+        if (mappedFiles.has(fingerprint)) continue;
+
+        const media = await mediaService.upload(
+          file,
+          req.user?._id?.toString(),
+          targetFolder,
+          `Student file - ${student.fullName}`,
+        );
+        uploadedMediaIds.push(String(media._id));
+        uploadedUrls.push(media.url);
+      }
+
+      student = await studentService.update(student._id as string, {
+        profileImage: profileImageUrl,
+        studentDocument: studentDocumentUrl,
+        files: uploadedUrls,
+      });
+    }
+  } catch (error) {
+    for (const mediaId of uploadedMediaIds) {
+      try {
+        await mediaService.delete(mediaId);
+      } catch (_cleanupError) {
+        // Ignore cleanup errors to preserve the original failure reason.
+      }
+    }
+
+    try {
+      await studentService.delete(student._id as string);
+    } catch (_cleanupError) {
+      // Ignore cleanup errors to preserve the original failure reason.
+    }
+
+    throw error;
   }
-
-  // 5. Update student record with final paths
-  const updateData: Record<string, any> = {};
-  if (profileImage) updateData.profileImage = fileMap.get(profileImage) ?? profileImage;
-  if (studentDocument) updateData.studentDocument = fileMap.get(studentDocument) ?? studentDocument;
-  if (fileNames.length > 0) updateData.files = fileNames.map(f => fileMap.get(f) ?? f);
-
-  student = await studentService.update(student._id as string, updateData);
 
   new ApiResponse(HTTP_STATUS.CREATED, 'Student created successfully', { student }).send(res);
 });

@@ -40,6 +40,7 @@ const studentSchema = new Schema<IStudent, IStudentModel>(
       type: String,
       unique: true,
       trim: true,
+      index: true,
     },
     fullName: {
       type: String,
@@ -151,7 +152,7 @@ studentSchema.index({ isActive: 1 });
 studentSchema.index({ status: 1 });
 studentSchema.index({ membershipType: 1 });
 studentSchema.index({ applicationDate: -1 });
-studentSchema.index({ studentId: 1 });
+
 
 /* ----------------------------- Pre-save ----------------------------- */
 studentSchema.pre<IStudent>('save', async function (next) {

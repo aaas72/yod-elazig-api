@@ -1,40 +1,22 @@
 import { Router } from 'express';
 import { studentController } from '../controllers';
-import { verifyToken, authorizeRoles, validate } from '../middlewares';
+import {
+  verifyToken,
+  authorizeRoles,
+  validate,
+  createUploadMiddleware,
+  createUploadErrorHandler,
+  UPLOAD_MIME_PRESETS,
+} from '../middlewares';
 import { createStudentRules, updateStudentRules, reviewStudentRules } from '../validators';
 import { ROLES } from '../constants';
-import multer from 'multer';
-import fs from 'fs';
-const upload = multer({
-  storage: multer.diskStorage({
-    destination: function (req, file, cb) {
-      const dir = 'uploads/temp';
-      try {
-        if (!fs.existsSync(dir)) {
-          fs.mkdirSync(dir, { recursive: true });
-        }
-        cb(null, dir);
-      } catch (err) {
-        cb(null, dir);
-      }
-    },
-    filename: function (req, file, cb) {
-      const ext = file.originalname.split('.').pop();
-      cb(null, `${Date.now()}-${Math.random().toString(36).substring(2)}.${ext}`);
-    },
-  }),
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
-  fileFilter: (_req, file, cb) => {
-    const allowed = [
-      'image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf'
-    ];
-    if (allowed.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new Error('نوع الملف غير مدعوم'));
-    }
-  },
+
+const upload = createUploadMiddleware({
+  maxFileSizeMB: 10,
+  allowedMimeTypes: UPLOAD_MIME_PRESETS.student,
+  rejectMessage: 'نوع الملف غير مدعوم. يُسمح فقط بـ JPEG, PNG, WebP, GIF, PDF',
 });
+const handleUploadError = createUploadErrorHandler(10);
 
 const router = Router();
 
@@ -56,6 +38,7 @@ router.post(
     { name: 'profileImage', maxCount: 1 },
     { name: 'studentDocument', maxCount: 1 }
   ]),
+  handleUploadError,
   createStudentRules,
   validate,
   studentController.createStudent
@@ -155,6 +138,7 @@ router.post(
     { name: 'profileImage', maxCount: 1 },
     { name: 'studentDocument', maxCount: 1 }
   ]),
+  handleUploadError,
   createStudentRules,
   validate,
   studentController.createStudent

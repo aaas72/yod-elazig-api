@@ -4,3 +4,8 @@ export { default as errorHandler } from './errorHandler';
 export { apiLimiter, authLimiter } from './rateLimiter';
 export { default as validate } from './validate';
 export { default as notFound } from './notFound';
+export {
+	createUploadMiddleware,
+	createUploadErrorHandler,
+	UPLOAD_MIME_PRESETS,
+} from './upload';

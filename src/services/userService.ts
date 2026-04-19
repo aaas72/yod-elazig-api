@@ -7,7 +7,7 @@ class UserService {
     const query: any = {};
     if (search) {
       const regex = new RegExp(search, 'i');
-      query.$or = [{ name: regex }, { email: regex }];
+      query.$or = [{ name: regex }, { username: regex }, { email: regex }];
     }
     const skip = (page - 1) * limit;
     const [users, total] = await Promise.all([
@@ -46,6 +46,9 @@ class UserService {
     if (!user) throw new Error('User not found');
     // فقط عدل الحقول التي تم إرسالها وغير undefined
     Object.entries(data).forEach(([key, value]) => {
+      if (key === 'username') {
+        return;
+      }
       if (value !== undefined && value !== '') {
         (user as any)[key] = value;
       }

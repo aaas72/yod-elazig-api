@@ -1,31 +1,20 @@
 import { Router } from 'express';
-import multer from 'multer';
 import { mediaController } from '../controllers';
-import { verifyToken, authorizeRoles } from '../middlewares';
+import {
+  verifyToken,
+  authorizeRoles,
+  createUploadMiddleware,
+  createUploadErrorHandler,
+  UPLOAD_MIME_PRESETS,
+} from '../middlewares';
 import { ROLES } from '../constants';
 
-// ── Multer configuration (memory storage for sharp processing) ──
-const upload = multer({
-  storage: multer.memoryStorage(),
-  limits: {
-    fileSize: 1 * 1024 * 1024, // 1MB max
-  },
-  fileFilter: (_req, file, cb) => {
-    const allowedMimes = [
-      'image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml',
-      'application/pdf',
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'application/vnd.ms-excel',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    ];
-    if (allowedMimes.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new Error('File type not allowed'));
-    }
-  },
+const upload = createUploadMiddleware({
+  maxFileSizeMB: 1,
+  allowedMimeTypes: UPLOAD_MIME_PRESETS.media,
+  rejectMessage: 'File type not allowed',
 });
+const handleUploadError = createUploadErrorHandler(1);
 
 const router = Router();
 const OBJECT_ID = ':id([0-9a-fA-F]{24})';
@@ -35,8 +24,8 @@ router.use(verifyToken);
 
 router.get('/', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.EDITOR), mediaController.getAllMedia);
 router.get(`/${OBJECT_ID}`, authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.EDITOR), mediaController.getMediaById);
-router.post('/upload', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.EDITOR), upload.single('file'), mediaController.uploadMedia);
-router.post('/upload/multiple', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.EDITOR), upload.array('files', 10), mediaController.uploadMultipleMedia);
+router.post('/upload', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.EDITOR), upload.single('file'), handleUploadError, mediaController.uploadMedia);
+router.post('/upload/multiple', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.EDITOR), upload.array('files', 10), handleUploadError, mediaController.uploadMultipleMedia);
 router.patch(`/${OBJECT_ID}`, authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.EDITOR), mediaController.updateMediaAlt);
 router.delete(`/${OBJECT_ID}`, authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN, ROLES.EDITOR), mediaController.deleteMedia);
 

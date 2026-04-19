@@ -12,6 +12,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const BASE = `http://localhost:${process.env.PORT || 5000}/api/v1`;
+const ADMIN_USERNAME = process.env.SUPER_ADMIN_USERNAME || process.env.SUPER_ADMIN_EMAIL || 'admin@yod-elazig.org';
 const ADMIN_EMAIL = process.env.SUPER_ADMIN_EMAIL || 'admin@yod-elazig.org';
 const ADMIN_PASS = process.env.SUPER_ADMIN_PASSWORD || 'Admin@123456';
 
@@ -110,7 +111,7 @@ async function testAuth() {
 
   // Login as admin
   const loginRes = await req('POST', '/auth/login', {
-    email: ADMIN_EMAIL,
+    username: ADMIN_USERNAME,
     password: ADMIN_PASS,
   });
   test('POST /auth/login (admin) → 200', loginRes.status === 200, `got ${loginRes.status}`);
@@ -637,8 +638,9 @@ async function testAuthProtection() {
   });
 
   if (regRes.status === 201) {
+    const studentUsername = regRes.data?.data?.user?.username || testEmail;
     const loginRes = await req('POST', '/auth/login', {
-      email: testEmail,
+      username: studentUsername,
       password: 'Student@123',
     });
     if (loginRes.status === 200) {

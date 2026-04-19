@@ -1,42 +1,22 @@
 import { Router } from 'express';
 import { reportController } from '../controllers';
-import { verifyToken, authorizeRoles, validate } from '../middlewares';
+import {
+  verifyToken,
+  authorizeRoles,
+  validate,
+  createUploadMiddleware,
+  createUploadErrorHandler,
+  UPLOAD_MIME_PRESETS,
+} from '../middlewares';
 import { createReportRules, updateReportRules } from '../validators';
 import { ROLES } from '../constants';
-import multer from 'multer';
-import fs from 'fs';
-import { logger } from '../utils';
 
-// ── Multer config for PDF uploads ────────────────────
-const upload = multer({
-  storage: multer.diskStorage({
-    destination: function (_req, _file, cb) {
-      const today = new Date().toISOString().slice(0, 10);
-      const dir = `uploads/reports/${today}`;
-      try {
-        if (!fs.existsSync(dir)) {
-          fs.mkdirSync(dir, { recursive: true });
-        }
-        cb(null, dir);
-      } catch (err) {
-        logger.error('Error creating directory:', err);
-        cb(err as Error, dir);
-      }
-    },
-    filename: function (_req, file, cb) {
-      const ext = file.originalname.split('.').pop();
-      cb(null, `report-${Date.now()}-${Math.random().toString(36).substring(2)}.${ext}`);
-    },
-  }),
-  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB max
-  fileFilter: (_req, file, cb) => {
-    if (file.mimetype === 'application/pdf') {
-      cb(null, true);
-    } else {
-      cb(new Error('Only PDF files are allowed'));
-    }
-  },
+const upload = createUploadMiddleware({
+  maxFileSizeMB: 20,
+  allowedMimeTypes: UPLOAD_MIME_PRESETS.pdf,
+  rejectMessage: 'Only PDF files are allowed',
 });
+const handleUploadError = createUploadErrorHandler(20);
 
 const router = Router();
 const OBJECT_ID = ':id([0-9a-fA-F]{24})';
@@ -49,8 +29,8 @@ router.use(verifyToken);
 
 router.get('/', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN), reportController.getAllReports);
 router.get(`/${OBJECT_ID}`, authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN), reportController.getReportById);
-router.post('/', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN), upload.single('file'), createReportRules, validate, reportController.createReport);
-router.put(`/${OBJECT_ID}`, authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN), upload.single('file'), updateReportRules, validate, reportController.updateReport);
+router.post('/', authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN), upload.single('file'), handleUploadError, createReportRules, validate, reportController.createReport);
+router.put(`/${OBJECT_ID}`, authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN), upload.single('file'), handleUploadError, updateReportRules, validate, reportController.updateReport);
 router.delete(`/${OBJECT_ID}`, authorizeRoles(ROLES.SUPER_ADMIN, ROLES.ADMIN), reportController.deleteReport);
 
 export default router;

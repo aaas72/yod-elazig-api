@@ -1,8 +1,10 @@
 import { FilterQuery } from 'mongoose';
 import { Report } from '../models';
 import { IReport } from '../models/Report';
+import Media from '../models/Media';
 import { ApiError } from '../utils';
 import { HTTP_STATUS } from '../constants';
+import mediaService from './mediaService';
 import fs from 'fs';
 import path from 'path';
 
@@ -68,11 +70,16 @@ class ReportService {
     const item = await Report.findById(id);
     if (!item) throw new ApiError(HTTP_STATUS.NOT_FOUND, 'Report not found');
 
-    // Delete the PDF file from disk
+    // Delete report file using unified media engine if possible.
     if (item.file) {
-      const filePath = path.join(process.cwd(), item.file);
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
+      const media = await Media.findOne({ url: item.file });
+      if (media) {
+        await mediaService.delete(String(media._id));
+      } else {
+        const filePath = path.join(process.cwd(), item.file.replace(/^\//, ''));
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
       }
     }
 

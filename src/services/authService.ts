@@ -11,6 +11,7 @@ class AuthService {
    */
   async register(data: {
     name: string;
+    username?: string;
     email: string;
     password: string;
     role?: string;
@@ -18,6 +19,15 @@ class AuthService {
     const existingUser = await User.findOne({ email: data.email });
     if (existingUser) {
       throw new ApiError(HTTP_STATUS.CONFLICT, 'Email already registered');
+    }
+
+    if (data.username) {
+      const username = data.username.trim().toLowerCase();
+      const existingByUsername = await User.findOne({ username });
+      if (existingByUsername) {
+        throw new ApiError(HTTP_STATUS.CONFLICT, 'Username already taken');
+      }
+      data.username = username;
     }
 
     const user = await User.create(data);
@@ -36,12 +46,25 @@ class AuthService {
    * Login user
    */
   async login(
-    email: string,
+    username: string,
     password: string,
   ): Promise<{ user: IUser; accessToken: string; refreshToken: string }> {
-    const user = await User.findOne({ email }).select('+password');
+    const identity = username.trim().toLowerCase();
+
+    let user = (await User.findOne({ username: identity }).select('+password')) as IUser | null;
+
+    // Backward compatibility for old clients/users still sending email.
+    if (!user && identity.includes('@')) {
+      user = (await User.findOne({ email: identity }).select('+password')) as IUser | null;
+    }
+
     if (!user || !(await user.comparePassword(password))) {
-      throw new ApiError(HTTP_STATUS.UNAUTHORIZED, 'Invalid email or password');
+      throw new ApiError(HTTP_STATUS.UNAUTHORIZED, 'Invalid username or password');
+    }
+
+    // Backfill missing usernames for old records on first successful login.
+    if (!user.username) {
+      await user.save();
     }
 
     if (!user.isActive) {
